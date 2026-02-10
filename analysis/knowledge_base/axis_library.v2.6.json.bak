@@ -1,0 +1,1636 @@
+"schema_version": "axis_library.v2.6",
+"meta": {
+"task": "Library Curation",
+"total_posts_scanned": 13,
+"curation_strategy": "Top-20 Highest Confidence per Axis"
+},
+
+"library_axes": [
+{
+"axis_name": "Sarcasm_Irony",
+"definition": "使用反語、誇張、政治梗或反諷式讚美，以傳達對時事、特定群體或荒謬現象的否定與嘲諷。",
+"stats": {
+"pos_count": 20,
+"unique_source_posts": 6
+},
+"pos_examples": [
+{
+"text": "無錢俾重要衝入廚房擸刀，果然係五千年文化",
+"id": "da7859925c1ce534e082095eed114845f11f1c0f2733d73a2f3c4ed408b8b811",
+"context_post_id": "360",
+"context_summary": "內地女子因牛雜糾紛鬧事",
+"reason": "引用「五千年文化」進行政治反諷 (Political Sarcasm)"
+},
+{
+"text": "咁應該冇事，好快放返佢、仲要一哥同粉麵店老闆一齊向佢道歉。",
+"id": "40e4405246eae851f80bd8e3534902fcb19a7d1b5f4c0a9b244c198b14c21405",
+"context_post_id": "360",
+"context_summary": "內地女子因牛雜糾紛鬧事",
+"reason": "透過描述荒謬的優待結果來諷刺執法雙重標準"
+},
+{
+"text": "正！香港有救啦！",
+"id": "40c2951226f8e3163b94bb80e1490924d2d32a591416a0ffbc3a9247f2d75c37",
+"context_post_id": "360",
+"context_summary": "內地女子因牛雜糾紛鬧事",
+"reason": "明顯的反語，實際意思為香港沒救了"
+},
+{
+"text": "辣條魔芋爽即食鳳爪娃哈哈伊利蒙牛康師傅蠟糖麻辣燙",
+"id": "c51ab38dfcc7953bc3e925ff818d5be5e5d0d787ab1434433ac101b0a2e5a8ef",
+"context_post_id": "355",
+"context_summary": "討論13歲女生發育過於成熟",
+"reason": "列舉大量內地零食暗示食品安全問題導致早熟"
+},
+{
+"text": "大家唔好亂屌住 人哋真係60歲 手冇巢皮係因為保養太好",
+"id": "wilcuswu_comment",
+"context_post_id": "237",
+"context_summary": "60歲女士獲得2元乘車優惠",
+"reason": "表面護航，實則諷刺外表與年齡不符或政策寬鬆"
+},
+{
+"text": "大家唔好亂屌住 因為今年已經係2047年",
+"id": "bluehk64_comment",
+"context_post_id": "237",
+"context_summary": "60歲女士獲得2元乘車優惠",
+"reason": "利用政治年份梗進行誇張諷刺"
+},
+{
+"text": "唔夠我媽勁 23:31就話成12點都未瞓🤣🤣",
+"id": "_justkais_comment",
+"context_post_id": "231",
+"context_summary": "新聞將6分51秒四捨五入為10分鐘",
+"reason": "引用生活誇張例子來諷刺新聞數據的荒謬"
+},
+{
+"text": "大家四捨五入都有兩米高",
+"id": "xjackson_lwcx_comment",
+"context_post_id": "231",
+"context_summary": "新聞將6分51秒四捨五入為10分鐘",
+"reason": "類比謬誤，諷刺數據處理方式"
+},
+{
+"text": "唔吹大d點對得住500幾億起出黎呀，無四捨五入到1個鐘咪算係咁囉",
+"id": "shing2386214_comment",
+"context_post_id": "231",
+"context_summary": "新聞將6分51秒四捨五入為10分鐘",
+"reason": "諷刺政府工程效益與宣傳手法"
+},
+{
+"text": "元素周期表",
+"id": "lwfbrown_comment",
+"context_post_id": "355",
+"context_summary": "討論13歲女生發育過於成熟",
+"reason": "以化學名詞代指食品添加劑，諷刺早熟原因"
+},
+{
+"text": "我地當年禁毒 又唔興食煙飲酒 而家唔知點解興返 有啲人仲以吸毒為榮",
+"id": "lllkm179_comment",
+"context_post_id": "355",
+"context_summary": "討論13歲女生外表成熟",
+"reason": "諷刺當代年輕人的不良風氣"
+},
+{
+"text": "所以咪唔會開槍唔會用胡椒噴霧 連胡椒粉都唔敢用",
+"id": "9addc2a2d96b86e5da81c874a446229b376658c80ae09aa9071a7e43e79af9c5",
+"context_post_id": "360",
+"context_summary": "內地女子鬧事",
+"reason": "諷刺警方對特定族群執法軟弱"
+},
+{
+"text": "好煩，就你程度用淺啲就話記者唔識字，唔就你喇用深啲又問點解用咁深。",
+"id": "gaakyoung_comment",
+"context_post_id": "236",
+"context_summary": "討論新聞用字「蹤杳」",
+"reason": "諷刺讀者難以取悅的矛盾心態"
+},
+{
+"text": "香港人真係好難服侍 世界級麻L煩 🙄",
+"id": "heyiwannabeawannabe_comment",
+"context_post_id": "236",
+"context_summary": "討論新聞用字「蹤杳」",
+"reason": "直接諷刺香港人的投訴文化"
+},
+{
+"text": "遇到呢啲人只有一種，佢係gay",
+"id": "kai_123_peace_comment",
+"context_post_id": "233",
+"context_summary": "女生分享完美男友特質",
+"reason": "以絕對否定的態度諷刺完美男人的存在可能性"
+},
+{
+"text": "兒子生性病啲fd, 2026年開始第二日就可以replace名句 恭喜哂👏🏼👏🏼繼續比佢用愛滋養你❤️❤️",
+"id": "soso_fate_comment",
+"context_post_id": "351",
+"context_summary": "求婚帖文寫「用愛滋養你」",
+"reason": "利用諧音梗進行黑色幽默諷刺"
+},
+{
+"text": "唔怪之得冇開槍😬",
+"id": "47208aa0ceb7764454b25604c7d5163964248492281ad6bf02403fd11a9d65f7",
+"context_post_id": "360",
+"context_summary": "內地女子鬧事",
+"reason": "諷刺執法雙重標準"
+},
+{
+"text": "老闆要公開道歉加賠償精神損失 話晒天龍人喎。。。",
+"id": "2574b42790c66b50817fccd2bd510a9e77fbdb7dc1d615fe338f8a9f08152f7e",
+"context_post_id": "360",
+"context_summary": "內地女子鬧事",
+"reason": "使用「天龍人」標籤進行階級諷刺"
+},
+{
+"text": "政府又要補貼多一個市民了",
+"id": "shing9145_comment",
+"context_post_id": "237",
+"context_summary": "60歲女士獲乘車優惠",
+"reason": "諷刺政府開支或人口老化問題"
+},
+{
+"text": "食蕃薯大",
+"id": "a3304d804ea34c8252b25af9a211b58884740af3095228717047d80755df4bb8",
+"context_post_id": "355",
+"context_summary": "討論13歲女生發育",
+"reason": "引用網絡迷因（蕃薯）進行無厘頭諷刺"
+}
+],
+"neg_examples": [
+{
+"text": "祝你哋幸福!",
+"id": "raymond.1022_comment",
+"context_post_id": "351",
+"reason": "真誠祝福"
+},
+{
+"text": "這是一個非常普遍的社會觀察... 1. 營養與生理發育提前...",
+"id": "harpia__harpyja_comment",
+"context_post_id": "355",
+"reason": "理性學術分析"
+},
+{
+"text": "求指教，瞓足10個鐘，鼻敏感+濕疹",
+"id": "kiki.yim00_comment",
+"context_post_id": "235",
+"reason": "真誠求助"
+},
+{
+"text": "恭喜哂嬸嬸，你不再是小姐了",
+"id": "x.jor_m_comment",
+"context_post_id": "237",
+"reason": "雖有調侃成分，但主要是陳述事實與祝賀，非惡意諷刺"
+},
+{
+"text": "65歲先係人生嘅開始👍",
+"id": "lt_tattoo6_comment",
+"context_post_id": "237",
+"reason": "正面鼓勵"
+},
+{
+"text": "我以前做過記者... 新聞傳播係應該用最淺白嘅用字",
+"id": "kevinlau0207_comment",
+"context_post_id": "236",
+"reason": "嚴肅的專業批評"
+},
+{
+"text": "準時走有咩問題?",
+"id": "00_employee_dialogue",
+"context_post_id": "230",
+"reason": "直率的反問，無諷刺意味"
+},
+{
+"text": "染髮樽一定係裝染髮劑",
+"id": "billy.li.16752_comment",
+"context_post_id": "234",
+"reason": "直述邏輯"
+}
+],
+"scoring_hints": {
+"lexical_cues": ["果然", "天龍人", "人才", "美麗新香港", "多謝", "有救", "5000年", "元素周期表"],
+"symbolic_cues": ["🤡", "🙄", "😅", "😂", "引號強調"]
+}
+},
+{
+"axis_name": "Mockery_Ridicule",
+"definition": "直接針對特定對象（人、群體、行為）進行取笑、羞辱或智力貶低，通常帶有攻擊性或優越感。",
+"stats": {
+"pos_count": 20,
+"unique_source_posts": 6
+},
+"pos_examples": [
+{
+"text": "無錢俾重要衝入廚房擸刀，果然係五千年文化",
+"id": "da7859925c1ce534e082095eed114845f11f1c0f2733d73a2f3c4ed408b8b811",
+"context_post_id": "360",
+"context_summary": "內地女子鬧事",
+"reason": "嘲笑其行為與文化背景"
+},
+{
+"text": "文盲 書又唔讀",
+"id": "hahago333_comment",
+"context_post_id": "236",
+"context_summary": "樓主批評新聞用字深",
+"reason": "直接羞辱樓主智力"
+},
+{
+"text": "明明唔係常用字，俾啲報紙懶叻咁用多幾次就係常用字？",
+"id": "oreoeddie_comment",
+"context_post_id": "236",
+"context_summary": "樓主批評新聞用字深",
+"reason": "嘲笑報紙賣弄文采"
+},
+{
+"text": "祝你幸福 但睇太快 睇左用愛滋 養你😂",
+"id": "cyw0012_comment",
+"context_post_id": "351",
+"context_summary": "求婚帖文",
+"reason": "嘲笑樓主的斷句與用詞歧義"
+},
+{
+"text": "杯老麥咖啡畫龍點睛",
+"id": "nopartyfor_comment",
+"context_post_id": "232",
+"context_summary": "中學生穿西裝參加派對",
+"reason": "嘲笑其裝扮與廉價道具的不協調"
+},
+{
+"text": "叫做好睇過倫敦金個班",
+"id": "bag_relaxing_comment",
+"context_post_id": "232",
+"context_summary": "中學生穿西裝參加派對",
+"reason": "將學生比作形象負面的倫敦金經紀"
+},
+{
+"text": "中間個件靚仔貼身，左邊鹹濕仔",
+"id": "246_hk_comment",
+"context_post_id": "232",
+"context_summary": "中學生穿西裝參加派對",
+"reason": "直接對外表進行人身攻擊/嘲笑"
+},
+{
+"text": "放學去鋼琴比賽咁嘅款",
+"id": "iireneliui_comment",
+"context_post_id": "232",
+"context_summary": "中學生穿西裝參加派對",
+"reason": "嘲笑其穿著過於正式或刻板"
+},
+{
+"text": "你估文化革命後代流架",
+"id": "9dda23a05fa52fcd56e4c1d95f53b8694bd9ac52492c550c297d31dde9f1ef1b",
+"context_post_id": "360",
+"context_summary": "內地女子鬧事",
+"reason": "針對背景進行嘲弄"
+},
+{
+"text": "條女應該係娥眉派掌門🤣",
+"id": "ab70ec26b02c124b61eb25243c4ca7131ca8b8f603a70c2d1e6a914fff288164",
+"context_post_id": "360",
+"context_summary": "內地女子鬧事",
+"reason": "嘲笑其行為誇張"
+},
+{
+"text": "大灣溶化區",
+"id": "b707d4404529c92420a4c15d9235be6c33621ddfb5e40f3e245b675861429fa0",
+"context_post_id": "360",
+"context_summary": "內地女子鬧事",
+"reason": "改名嘲笑大灣區融合政策"
+},
+{
+"text": "最主要係打扮, 仲要化到個妝好似出嚟撈咁。",
+"id": "2260cef43f6be996475c43959d543eeb9168517ab7b6d88b646923aeb441b3a1",
+"context_post_id": "355",
+"context_summary": "13歲女生打扮成熟",
+"reason": "直接羞辱女生的妝容像性工作者"
+},
+{
+"text": "食屎大🙂‍↕️☠️",
+"id": "c944dfa065fac4efbef31535a635d65346bd967a3effe019d15910caf224f01c",
+"context_post_id": "355",
+"context_summary": "13歲女生打扮成熟",
+"reason": "粗俗的人身攻擊"
+},
+{
+"text": "你一定冇裝防騙伺服器。",
+"id": "iamcorydorasprincess_comment",
+"context_post_id": "232",
+"context_summary": "中學生自稱打贏99.9%學生",
+"reason": "嘲笑樓主自我感覺過於良好"
+},
+{
+"text": "樓主，你而家個狀況叫做杳如黃鶴 俾人鬧到無影",
+"id": "eblouissant2478_comment",
+"context_post_id": "236",
+"context_summary": "樓主批評新聞用字深被圍攻",
+"reason": "嘲笑樓主不敢回應"
+},
+{
+"text": "的士佬轉咗行去報新聞",
+"id": "philip0416_comment",
+"context_post_id": "231",
+"context_summary": "新聞四捨五入時間",
+"reason": "嘲笑記者的計算方式像濫收車資的的士司機"
+},
+{
+"text": "去多啲觀濱殘廁就得",
+"id": "6b796466d5a9fc0e3aca0812c328fec0b5667356d06fdfb3805d3ffd32949519",
+"context_post_id": "355",
+"context_summary": "13歲女生打扮成熟",
+"reason": "引用負面新聞（殘廁Gathering）進行道德嘲弄"
+},
+{
+"text": "死啦我18歲我睇落去似13 ￼🤡",
+"id": "c335443593f9dee90d46c844c14eb0ac65f2e744278ad6561fc08d0a77b317fc",
+"context_post_id": "355",
+"context_summary": "討論早熟",
+"reason": "透過對比嘲笑現狀（包含自嘲與嘲諷時下風氣）"
+},
+{
+"text": "中三咋，細力d 😭",
+"id": "nub.r_comment",
+"context_post_id": "232",
+"context_summary": "中學生穿西裝",
+"reason": "以反話形式嘲笑他們年紀小扮大人"
+},
+{
+"text": "好想知句對白係乜？「我想嫁畀你 應承我」",
+"id": "cknt83_comment",
+"context_post_id": "351",
+"context_summary": "求婚帖文",
+"reason": "嘲笑求婚場景像做戲"
+}
+],
+"neg_examples": [
+{
+"text": "其實這個字並非生僻字，是常用字... 只要平時多閱讀...便會見到",
+"id": "eriko.kitayama_comment",
+"context_post_id": "236",
+"reason": "客觀解釋與建議，無嘲笑語氣"
+},
+{
+"text": "很好的主意 但其實西裝有好多種 呢種都係西裝",
+"id": "lochristoper_comment",
+"context_post_id": "232",
+"reason": "溫和的觀點表達"
+},
+{
+"text": "恭喜哂嬸嬸，你不再是小姐了",
+"id": "x.jor_m_comment",
+"context_post_id": "237",
+"reason": "玩笑性質的祝賀，非惡意攻擊"
+},
+{
+"text": "1:29 round down係1個鐘 1:36 round up係2個鐘",
+"id": "holland_laam_comment",
+"context_post_id": "231",
+"reason": "純數學討論"
+},
+{
+"text": "大家唔好亂屌住",
+"id": "wilcuswu_comment",
+"context_post_id": "237",
+"reason": "呼籲冷靜，反諷性質但形式上是阻止嘲笑"
+},
+{
+"text": "我80後都唔覺得準時走有咩問題",
+"id": "pilotwarezhk80_comment",
+"context_post_id": "230",
+"reason": "表達立場，無攻擊性"
+},
+{
+"text": "染髮樽一定係裝染髮劑",
+"id": "billy.li.16752_comment",
+"context_post_id": "234",
+"reason": "中性陳述"
+},
+{
+"text": "我都想真係有拖拍😔",
+"id": "lzq.*.0306_comment",
+"context_post_id": "233",
+"reason": "自我表達，無嘲笑他人"
+}
+],
+"scoring_hints": {
+"lexical_cues": ["文盲", "出嚟撈", "食屎", "倫敦金", "防騙", "愛滋", "殘廁"],
+"symbolic_cues": ["🤡", "😭 (mocking)", "🤣", "💀"]
+}
+},
+{
+"axis_name": "Inquisitive_Demand",
+"definition": "強烈表達對資訊、教學、或後續更新的渴望，通常伴隨請求、排隊（留名）或急切的情緒。",
+"stats": {
+"pos_count": 20,
+"unique_source_posts": 4
+},
+"pos_examples": [
+{
+"text": "omg啱啱瞓醒點解咁多人嘅😱😱 而家即刻跳起身化😭😭😭",
+"id": "fuxkmylife0503_comment",
+"context_post_id": "235",
+"context_summary": "黑眼圈遮瑕教學",
+"reason": "回應群眾強烈需求的急切行動 (High Demand Response)"
+},
+{
+"text": "大師 有冇諗住分享下",
+"id": "jolryo.jagosipda_comment",
+"context_post_id": "235",
+"context_summary": "黑眼圈遮瑕教學",
+"reason": "尊稱對方並請求分享"
+},
+{
+"text": "求指教，瞓足10個鐘，鼻敏感+濕疹",
+"id": "kiki.yim00_comment",
+"context_post_id": "235",
+"context_summary": "黑眼圈遮瑕教學",
+"reason": "提供自身狀況並誠懇求教"
+},
+{
+"text": "好想知道你用咩遮瑕膏",
+"id": "lovelovelsrfm_nstrawberry_comment",
+"context_post_id": "235",
+"context_summary": "黑眼圈遮瑕教學",
+"reason": "直接詢問產品資訊"
+},
+{
+"text": "加一想知😭😭我唔識遮 遮完都灰🤡",
+"id": "huh_whatusayy_comment",
+"context_post_id": "235",
+"context_summary": "黑眼圈遮瑕教學",
+"reason": "表達困擾並加入請求隊列"
+},
+{
+"text": "請問拜師條隊龍尾喺邊？🙏🏻",
+"id": "sherina.lui_comment",
+"context_post_id": "235",
+"context_summary": "黑眼圈遮瑕教學",
+"reason": "幽默地表達排隊求教的意願"
+},
+{
+"text": "遮得好好，留名等教程",
+"id": "peggy_81621_comment",
+"context_post_id": "235",
+"context_summary": "黑眼圈遮瑕教學",
+"reason": "標準的「留名」(LM) 行為"
+},
+{
+"text": "LM!! Pls I need answers🥹",
+"id": "caseychw_comment",
+"context_post_id": "235",
+"context_summary": "黑眼圈遮瑕教學",
+"reason": "強烈的情感表達 (Need answers)"
+},
+{
+"text": "求教 千年黑眼圈遮極都係有個灰色印",
+"id": "yingc_12_comment",
+"context_post_id": "235",
+"context_summary": "黑眼圈遮瑕教學",
+"reason": "描述具體痛點的求助"
+},
+{
+"text": "po主你幾時起身😭",
+"id": "_kumamoroll__comment",
+"context_post_id": "235",
+"context_summary": "黑眼圈遮瑕教學",
+"reason": "催促樓主更新"
+},
+{
+"text": "OMG好勁🥺 我lm等教程",
+"id": "susannnnnna.lam__comment",
+"context_post_id": "235",
+"context_summary": "黑眼圈遮瑕教學",
+"reason": "讚嘆後隨即請求"
+},
+{
+"text": "我靠 你好強！💖 排隊先排隊先",
+"id": "huh.*.huh.0316_comment",
+"context_post_id": "235",
+"context_summary": "黑眼圈遮瑕教學",
+"reason": "以「排隊」表達強烈的等待意願"
+},
+{
+"text": "有冇人同我講有咩可以增肥（除咗藥） 小妹我150cm,39kg想去43kg左右🙏🏻🙏🏻🙏🏻",
+"id": "354_post_body",
+"context_post_id": "354",
+"context_summary": "女生求增肥方法",
+"reason": "直接發文求助"
+},
+{
+"text": "求教學～我仲要有淚溝🥹",
+"id": "wookikii_comment",
+"context_post_id": "235",
+"context_summary": "黑眼圈遮瑕教學",
+"reason": "附加額外條件的求助"
+},
+{
+"text": "姐姐你用咩hand cream🥹🥹🥹",
+"id": "nekokoreo.chassepot_comment",
+"context_post_id": "237",
+"context_summary": "60歲女士手部皮膚好",
+"reason": "因觀察到細節而產生的求知慾"
+},
+{
+"text": "好想知句對白係乜？",
+"id": "cknt83_comment",
+"context_post_id": "351",
+"context_summary": "求婚帖文",
+"reason": "對具體細節的好奇"
+},
+{
+"text": "點讀？",
+"id": "yiu____0318_comment",
+"context_post_id": "236",
+"context_summary": "新聞用字「蹤杳」",
+"reason": "簡單直接的知識請求"
+},
+{
+"text": "有點好奇，你名字是May Chan還是張偉紅。",
+"id": "anbeos_comment",
+"context_post_id": "237",
+"context_summary": "JoyYou卡顯示姓名",
+"reason": "對個人資訊的好奇詢問"
+},
+{
+"text": "會唔會周圍遊車河？",
+"id": "qooqoola_comment",
+"context_post_id": "237",
+"context_summary": "獲得2元乘車優惠",
+"reason": "詢問後續計劃"
+},
+{
+"text": "你幾歲？我覺得每日飲奶 對胸係有幫助.",
+"id": "imnotfuckingbored_comment",
+"context_post_id": "354",
+"context_summary": "女生求增肥",
+"reason": "為了提供建議而反問資訊"
+}
+],
+"neg_examples": [
+{
+"text": "真係會有人睇咩😂聽日試吓update😗😗",
+"id": "fuxkmylife0503_reply",
+"context_post_id": "235",
+"reason": "這是回應需求，而非提出需求"
+},
+{
+"text": "有神快拜🙇🏻‍♂️",
+"id": "pkss53_comment",
+"context_post_id": "235",
+"reason": "純粹的讚嘆/膜拜，無具體請求"
+},
+{
+"text": "你眼好靚！！！好特別",
+"id": "leiiiiiila0906_comment",
+"context_post_id": "235",
+"reason": "純粹的稱讚"
+},
+{
+"text": "「蹤杳」廣東話讀音「鐘秒」",
+"id": "eriko.kitayama_comment",
+"context_post_id": "236",
+"reason": "提供答案"
+},
+{
+"text": "唔好意思仲要返工必須係繁忙時￼間搭！🙏",
+"id": "chanmay9919_comment",
+"context_post_id": "237",
+"reason": "解釋情況"
+},
+{
+"text": "大家唔好亂屌住",
+"id": "wilcuswu_comment",
+"context_post_id": "237",
+"reason": "呼籲/命令"
+},
+{
+"text": "唔識就學",
+"id": "shakokjim2019_comment",
+"context_post_id": "236",
+"reason": "命令/批評"
+},
+{
+"text": "順其自然，肥左你想瘦就好難",
+"id": "s_suikun_comment",
+"context_post_id": "354",
+"reason": "勸告"
+}
+],
+"scoring_hints": {
+"lexical_cues": ["求", "LM", "留名", "想知", "點做", "請教", "教學", "update"],
+"symbolic_cues": ["🥺", "😭", "🙏🏻", "🙇🏻‍♂️"]
+}
+},
+{
+"axis_name": "Rational_Analysis",
+"definition": "提供客觀事實、邏輯推論、學術解釋或建設性建議，語氣通常冷靜、資訊含量高。",
+"stats": {
+"pos_count": 20,
+"unique_source_posts": 6
+},
+"pos_examples": [
+{
+"text": "這是一個非常普遍的社會觀察... 1. 營養與生理發育提前... 2. 化妝技術與護膚普及...",
+"id": "harpia__harpyja_comment",
+"context_post_id": "355",
+"context_summary": "13歲女生外表成熟",
+"reason": "結構化的社會學/生理學分析 (High Quality)"
+},
+{
+"text": "穿衣自由與模仿：現在的年輕人不再穿充滿童趣的衣服，而是流行「韓系」... 這些穿搭原本是成年人的專利",
+"id": "45e081ba6a4e9f6da3de965f8d190918d3a4d960c9d620a78d16295f68b51f94",
+"context_post_id": "355",
+"context_summary": "13歲女生外表成熟",
+"reason": "詳細分析時尚趨勢與心理因素"
+},
+{
+"text": "其實這個字並非生僻字，是常用字，除了大公文匯外，星島日報、01新聞等報章也會用到",
+"id": "eriko.kitayama_comment",
+"context_post_id": "236",
+"context_summary": "新聞用字「蹤杳」",
+"reason": "引用事實來源來糾正誤解"
+},
+{
+"text": "新聞傳播係應該用最淺白嘅用字... 「蹤杳」呢個字你唔可以話好難 但當有多過一個人第一下睇唔明 個新聞傳意已經係失敗咗",
+"id": "kevinlau0207_comment",
+"context_post_id": "236",
+"context_summary": "新聞用字「蹤杳」",
+"reason": "基於傳播學理論的專業分析"
+},
+{
+"text": "「蹤杳」廣東話讀音「鐘秒」 失蹤的蹤 杳無音信的杳",
+"id": "eriko.kitayama_pronunciation",
+"context_post_id": "236",
+"context_summary": "新聞用字「蹤杳」",
+"reason": "提供準確的語文知識"
+},
+{
+"text": "超簡化版講法：其實係加減數 消耗幾多-吸收幾多≈體重增減... 找中醫師打個平安脈",
+"id": "littleman_white_comment",
+"context_post_id": "354",
+"context_summary": "女生求增肥",
+"reason": "提供科學原理與具體建議"
+},
+{
+"text": "Check InBody 睇你消幾多cal 之後只要食多個果數就ok 但想增肌要配合weight training",
+"id": "shadowing_lkin_comment",
+"context_post_id": "354",
+"context_summary": "女生求增肥",
+"reason": "具體的操作建議 (Actionable Advice)"
+},
+{
+"text": "Breast is mostly made up of mammary glands & fats. Eat & intake regular food that boost the growth of glands...",
+"id": "kiritotam2005_comment",
+"context_post_id": "354",
+"context_summary": "女生求增肥/豐胸",
+"reason": "生物學解釋"
+},
+{
+"text": "食多啲蛋豆腐、三文魚、牛肉，蛋白質鐵質多，增加肌肉比增肥好",
+"id": "hotwater_6_foot_comment",
+"context_post_id": "354",
+"context_summary": "女生求增肥",
+"reason": "具體的營養建議"
+},
+{
+"text": "1:29 round down係1個鐘 1:36 round up係2個鐘",
+"id": "holalnd_laam_math",
+"context_post_id": "231",
+"context_summary": "新聞時間四捨五入",
+"reason": "數學邏輯解釋"
+},
+{
+"text": "許冠傑廣東歌《梨渦淺笑》都有「花依舊玉人杳」，supposedly 係優美中文",
+"id": "colinlai_comment",
+"context_post_id": "236",
+"context_summary": "新聞用字「蹤杳」",
+"reason": "引用文化典故佐證"
+},
+{
+"text": "因為唔用，先會用得少，所以先令到有人唔識。其實用多啲，咪識囉！一個詞語消失，就係一個概念消失",
+"id": "angus_tam_comment",
+"context_post_id": "236",
+"context_summary": "新聞用字「蹤杳」",
+"reason": "語言學與文化傳承的邏輯推演"
+},
+{
+"text": "我舊時都係長期過瘦，飲埋營養奶粉，因為身體差吸收得唔好，到30歲後自動唔會再係呢個體質",
+"id": "lawsiubing_comment",
+"context_post_id": "354",
+"context_summary": "女生求增肥",
+"reason": "基於個人經驗的生理分析"
+},
+{
+"text": "應該話你升唔升到職都無固定準則... 係睇老闆有幾鍾意你。要令老闆鍾意你唔一定建基於OT",
+"id": "vincenthohoho_comment",
+"context_post_id": "230",
+"context_summary": "00後準時收工",
+"reason": "職場生存法則的邏輯分析"
+},
+{
+"text": "大家工作能力差唔多，要升就會升肯為公司諗多一步既人，唔係淨係諗自己既人！",
+"id": "meme_somix_comment",
+"context_post_id": "230",
+"context_summary": "00後準時收工",
+"reason": "管理層視角的解釋"
+},
+{
+"text": "寫heading得幾個字位，當然用最少字又表達到就最好啦",
+"id": "say.nothing75_comment",
+"context_post_id": "236",
+"context_summary": "新聞用字「蹤杳」",
+"reason": "排版限制的現實考量"
+},
+{
+"text": "染髮樽一定係裝染髮劑, 裝咳藥水/丸仔/白粉吾得既.",
+"id": "billy.li.16752_comment",
+"context_post_id": "234",
+"context_summary": "山上發現染髮劑",
+"reason": "基於容器特性的邏輯排除法"
+},
+{
+"text": "其實，當學多個詞語都得㗎啫... 如果用失蹤，就要寫「如廁後失蹤」，要用多個字",
+"id": "winniezai_comment",
+"context_post_id": "236",
+"context_summary": "新聞用字「蹤杳」",
+"reason": "字數效益分析"
+},
+{
+"text": "最主要係打扮, 仲要化到個妝好似出嚟撈咁。呢啲靚妹通常好細個已經冇曬童真，可能屋企環境逼成。",
+"id": "sirtaromonkey_comment",
+"context_post_id": "355",
+"context_summary": "13歲女生外表成熟",
+"reason": "分析成因（家庭環境）"
+},
+{
+"text": "我80後都唔覺得準時走有咩問題，我反而會叫我啲細嘅唔好OT，唔好俾公司覺得你OT係應份嘅",
+"id": "pilotwarezhk80_comment",
+"context_post_id": "230",
+"context_summary": "00後準時收工",
+"reason": "職場管理哲學分享"
+}
+],
+"neg_examples": [
+{
+"text": "文盲 書又唔讀",
+"id": "hahago333_comment",
+"context_post_id": "236",
+"reason": "純粹的人身攻擊，無分析內容"
+},
+{
+"text": "食屎大🙂‍↕️☠️",
+"id": "c944dfa065fac4efbef31535a635d65346bd967a3effe019d15910caf224f01c",
+"context_post_id": "355",
+"reason": "無意義的謾罵"
+},
+{
+"text": "好想知句對白係乜？",
+"id": "cknt83_comment",
+"context_post_id": "351",
+"reason": "提問而非分析"
+},
+{
+"text": "祝你哋幸福!",
+"id": "raymond.1022_comment",
+"context_post_id": "351",
+"reason": "祝賀"
+},
+{
+"text": "杯老麥咖啡畫龍點睛",
+"id": "nopartyfor_comment",
+"context_post_id": "232",
+"reason": "嘲笑/評論，非深入分析"
+},
+{
+"text": "我俾啲脂肪你😌",
+"id": "holalittleprince_comment",
+"context_post_id": "354",
+"reason": "玩笑"
+},
+{
+"text": "大家唔好亂屌住",
+"id": "wilcuswu_comment",
+"context_post_id": "237",
+"reason": "情緒呼籲"
+},
+{
+"text": "求教學！",
+"id": "tanyingci_comment",
+"context_post_id": "235",
+"reason": "請求"
+}
+],
+"scoring_hints": {
+"lexical_cues": ["其實", "因為", "導致", "理論", "觀察", "建議", "原理", "邏輯"],
+"symbolic_cues": ["數字列表 (1. 2. 3.)", "長篇大論"]
+}
+},
+{
+"axis_name": "Supportive_Affirmation",
+"definition": "表達真誠的祝賀、鼓勵、支持或認同，語氣正面且友善。",
+"stats": {
+"pos_count": 20,
+"unique_source_posts": 6
+},
+"pos_examples": [
+{
+"text": "早翻工，準備交齊野，準時放工 其實做夠有突，無得挑剔",
+"id": "missdukiary_comment",
+"context_post_id": "230",
+"context_summary": "00後準時收工",
+"reason": "完全認同與支持00後的工作態度"
+},
+{
+"text": "我80後都唔覺得準時走有咩問題，我反而會叫我啲細嘅唔好OT",
+"id": "pilotwarezhk80_comment",
+"context_post_id": "230",
+"context_summary": "00後準時收工",
+"reason": "跨世代的支持與認同"
+},
+{
+"text": "我覺得啱喎，準時返工就應該準時放工，我唔係睇人面色返工",
+"id": "kiss.theguy_comment",
+"context_post_id": "230",
+"context_summary": "00後準時收工",
+"reason": "堅定的立場支持"
+},
+{
+"text": "祝你哋幸福!",
+"id": "raymond.1022_comment",
+"context_post_id": "351",
+"context_summary": "求婚帖文",
+"reason": "標準的祝賀"
+},
+{
+"text": "拍得超好，超浪漫，祝你們幸福💙",
+"id": "kikiwong_0229_comment",
+"context_post_id": "351",
+"context_summary": "求婚帖文",
+"reason": "讚美加祝福"
+},
+{
+"text": "恭喜啊啊啊啊啊😭💕💗",
+"id": "2amberrr_comment",
+"context_post_id": "351",
+"context_summary": "求婚帖文",
+"reason": "激動的祝賀 (High Emotion)"
+},
+{
+"text": "我就係想睇呢啲！恭喜你地啊🥹❤️",
+"id": "littlebysunclub_comment",
+"context_post_id": "351",
+"context_summary": "求婚帖文",
+"reason": "表達對美好事物的喜愛與支持"
+},
+{
+"text": "幾多歲都可以係小姐！",
+"id": "blackbananabb_comment",
+"context_post_id": "237",
+"context_summary": "60歲女士獲樂悠卡",
+"reason": "對年齡焦慮的溫暖安慰與賦權"
+},
+{
+"text": "歡迎使用Threads，活到老學到老",
+"id": "samsonpmk_comment",
+"context_post_id": "237",
+"context_summary": "60歲女士獲樂悠卡",
+"reason": "歡迎新用戶，正面鼓勵"
+},
+{
+"text": "恭喜😂😂😂😂 之後覺得就算點搭車 都好像不用增值 會更加開心",
+"id": "m2i_m2ndy_rlaq_comment",
+"context_post_id": "237",
+"context_summary": "60歲女士獲樂悠卡",
+"reason": "分享喜悅與好處"
+},
+{
+"text": "人生階段，另一個身份開始。好好享用帶來的福利",
+"id": "wailingrace_comment",
+"context_post_id": "237",
+"context_summary": "60歲女士獲樂悠卡",
+"reason": "正面看待老化過程"
+},
+{
+"text": "心境年青永遠都係少女",
+"id": "little_pandada_comment",
+"context_post_id": "237",
+"context_summary": "60歲女士獲樂悠卡",
+"reason": "心態上的肯定"
+},
+{
+"text": "你眼好靚！！！好特別，飛揚又好靈動嘅感覺，但又有啲溫柔🥺",
+"id": "leiiiiiila0906_comment",
+"context_post_id": "235",
+"context_summary": "黑眼圈遮瑕教學",
+"reason": "具體且真誠的讚美"
+},
+{
+"text": "遮得非常好😋👍🏻",
+"id": "tskwants_comment",
+"context_post_id": "235",
+"context_summary": "黑眼圈遮瑕教學",
+"reason": "肯定技術"
+},
+{
+"text": "恭喜師姐 好似拍緊韓劇咁🥹🥹",
+"id": "angellln_n_comment",
+"context_post_id": "351",
+"context_summary": "求婚帖文",
+"reason": "高度讚美（比喻為韓劇）"
+},
+{
+"text": "新年伊始在threads上看到這麼美好勇敢的女孩，感性的我😭，祝願你們幸福快樂！",
+"id": "alveracious_comment",
+"context_post_id": "351",
+"context_summary": "求婚帖文",
+"reason": "感性的祝福"
+},
+{
+"text": "執到咁正 值得鼓勵一下👍🏻",
+"id": "your_lil_frd_comment",
+"context_post_id": "232",
+"context_summary": "中學生穿西裝",
+"reason": "對嘗試打扮的正面鼓勵"
+},
+{
+"text": "掂👍🏻🎁",
+"id": "tattoo_2mm_comment",
+"context_post_id": "232",
+"context_summary": "中學生穿西裝",
+"reason": "簡短有力的肯定"
+},
+{
+"text": "good job",
+"id": "ivan__shirley_comment",
+"context_post_id": "230",
+"context_summary": "00後準時收工",
+"reason": "直接稱讚"
+},
+{
+"text": "恭喜公主/女皇大人！絕對仲係小姐！",
+"id": "rillia_242_comment",
+"context_post_id": "237",
+"context_summary": "60歲女士獲樂悠卡",
+"reason": "極度寵溺的稱呼與肯定"
+}
+],
+"neg_examples": [
+{
+"text": "恭喜哂嬸嬸，你不再是小姐了",
+"id": "x.jor_m_comment",
+"context_post_id": "237",
+"reason": "雖有恭喜，但後半句帶有調侃/否定意味"
+},
+{
+"text": "好快離 有外遇",
+"id": "ended1212_comment",
+"context_post_id": "351",
+"reason": "惡意詛咒"
+},
+{
+"text": "正！香港有救啦！",
+"id": "40c2951226f8e3163b94bb80e1490924d2d32a591416a0ffbc3a9247f2d75c37",
+"context_post_id": "360",
+"reason": "反諷，非真誠支持"
+},
+{
+"text": "唔吹大d點對得住500幾億起出黎呀",
+"id": "shing2386214_comment",
+"context_post_id": "231",
+"reason": "批評/諷刺"
+},
+{
+"text": "你一定冇裝防騙伺服器。",
+"id": "iamcorydorasprincess_comment",
+"context_post_id": "232",
+"reason": "嘲笑"
+},
+{
+"text": "求教學～",
+"id": "wookikii_comment",
+"context_post_id": "235",
+"reason": "請求"
+},
+{
+"text": "係咪有鼻敏感？🙈",
+"id": "cwing_hk.makeup_art_comment",
+"context_post_id": "235",
+"reason": "猜測/詢問"
+},
+{
+"text": "我80後都唔覺得準時走有咩問題",
+"id": "pilotwarezhk80_comment",
+"context_post_id": "230",
+"reason": "雖然支持，但這是意見表達而非對特定人的直接祝賀（此為邊緣案例，但歸類在支持仍可，只是對比純祝賀略不同）"
+}
+],
+"scoring_hints": {
+"lexical_cues": ["恭喜", "支持", "好睇", "靚", "幸福", "加油", "good job", "無得挑剔"],
+"symbolic_cues": ["👍🏻", "❤️", "🥰", "🎉", "🥹"]
+}
+},
+{
+"axis_name": "Playful_Humor",
+"definition": "輕鬆的玩笑、幽默的腦補、諧音梗或無惡意的調侃，旨在製造歡樂氣氛。",
+"stats": {
+"pos_count": 20,
+"unique_source_posts": 6
+},
+"pos_examples": [
+{
+"text": "特務臨時變裝用",
+"id": "sk_iixx_comment",
+"context_post_id": "234",
+"context_summary": "山上發現染髮劑",
+"reason": "天馬行空的創意聯想 (Creative Speculation)"
+},
+{
+"text": "非法入境者要逃避追捕所以要染髮😎",
+"id": "shirleychanchanchan_comment",
+"context_post_id": "234",
+"context_summary": "山上發現染髮劑",
+"reason": "結合時事的幽默推測"
+},
+{
+"text": "可以係山上染髮，特別上色🤣🤣",
+"id": "mickeykatykiki_comment",
+"context_post_id": "234",
+"context_summary": "山上發現染髮劑",
+"reason": "荒謬的邏輯笑話"
+},
+{
+"text": "都得既， 可以用溪水洗頭！",
+"id": "unicorn.8672159_comment",
+"context_post_id": "234",
+"context_summary": "山上發現染髮劑",
+"reason": "順著荒謬邏輯的玩笑"
+},
+{
+"text": "🤣試下係party講埋：幫我開枝25年嘅可樂",
+"id": "icebee321_comment",
+"context_post_id": "232",
+"context_summary": "中學生穿西裝",
+"reason": "引用經典電影對白（喜劇之王）的梗"
+},
+{
+"text": "爭支紅玫瑰囉，咬住入課室型過99.9%學生",
+"id": "raver_flows_in_you_comment",
+"context_post_id": "232",
+"context_summary": "中學生穿西裝",
+"reason": "誇張的畫面感建議"
+},
+{
+"text": "我俾啲脂肪你😌",
+"id": "holalittleprince_comment",
+"context_post_id": "354",
+"context_summary": "女生求增肥",
+"reason": "常見的友善玩笑"
+},
+{
+"text": "我分少少肉俾你🙏🏻🙏🏻🙏🏻",
+"id": "kayeon_k9_comment",
+"context_post_id": "354",
+"context_summary": "女生求增肥",
+"reason": "常見的友善玩笑"
+},
+{
+"text": "今日瘋狂食麥樂雞…",
+"id": "jack2911k_k8_comment",
+"context_post_id": "354",
+"context_summary": "女生求增肥",
+"reason": "無厘頭的個人分享作為建議"
+},
+{
+"text": "如果想個波大啲可以日日去飲豆奶 維他奶嗰啲都得 之前聽人講話有效 然後我試過真係ok",
+"id": "coquxtte.*_comment",
+"context_post_id": "354",
+"context_summary": "女生求增肥/豐胸",
+"reason": "雖然是建議，但帶有都市傳說的輕鬆感"
+},
+{
+"text": "大家忽略我防劇透嗰句￼！🙏🏻我以為增肥個波會大啲",
+"id": "illlooovveuu_pinned",
+"context_post_id": "354",
+"context_summary": "女生求增肥",
+"reason": "樓主自嘲的幽默"
+},
+{
+"text": "唔好意思仲要返工必須係繁忙時￼間搭！🙏",
+"id": "chanmay9919_reply",
+"context_post_id": "237",
+"context_summary": "60歲女士獲優惠",
+"reason": "幽默地回應別人的提醒（不要繁忙時間搭）"
+},
+{
+"text": "如果落到去中環，肯定溝死女😆",
+"id": "hang_lo__comment",
+"context_post_id": "232",
+"context_summary": "中學生穿西裝",
+"reason": "誇張的讚美/玩笑"
+},
+{
+"text": "海南大附屬😂",
+"id": "king.sley3336_comment",
+"context_post_id": "232",
+"context_summary": "中學生穿西裝",
+"reason": "引用動漫（灌籃高手）進行聯想"
+},
+{
+"text": "中央台！！！ 明啦！",
+"id": "tae_tae_tae_t_comment",
+"context_post_id": "231",
+"context_summary": "新聞四捨五入",
+"reason": "隱晦的政治笑話（暗指造假）"
+},
+{
+"text": "孫果d friend",
+"id": "pitsol_comment",
+"context_post_id": "234",
+"context_summary": "山上發現染髮劑",
+"reason": "引用都市傳說（跑馬地紙盒藏屍案/山上隱居者）"
+},
+{
+"text": "勁,可以染一D人哋睇唔倒地方呢",
+"id": "leung_wingleung_comment",
+"context_post_id": "234",
+"context_summary": "山上發現染髮劑",
+"reason": "帶有暗示性的黃色笑話"
+},
+{
+"text": "會唔會係啲人吸毒冇錢所以買呢啲染髮劑頂住檔先",
+"id": "abbystarrain_comment",
+"context_post_id": "234",
+"context_summary": "山上發現染髮劑",
+"reason": "極度荒謬的推測"
+},
+{
+"text": "真露加煙 法力無邊",
+"id": "nat2not_comment",
+"context_post_id": "355",
+"context_summary": "13歲女生外表成熟",
+"reason": "引用押韻俗語"
+},
+{
+"text": "可以試下帶埋帽",
+"id": "lilyszeling_comment",
+"context_post_id": "232",
+"context_summary": "中學生穿西裝",
+"reason": "這可能是個玩笑建議（戴綠帽？或單純配搭）"
+}
+],
+"neg_examples": [
+{
+"text": "無錢俾重要衝入廚房擸刀，果然係五千年文化",
+"id": "da785..._comment",
+"context_post_id": "360",
+"reason": "這是諷刺(Sarcasm)，帶有攻擊性"
+},
+{
+"text": "杯老麥咖啡畫龍點睛",
+"id": "nopartyfor__comment",
+"context_post_id": "232",
+"reason": "這是嘲笑(Mockery)"
+},
+{
+"text": "染髮樽一定係裝染髮劑",
+"id": "billy.li.16752_comment",
+"context_post_id": "234",
+"reason": "認真魔人(Literal/Logical)"
+},
+{
+"text": "文盲 書又唔讀",
+"id": "hahago333_comment",
+"context_post_id": "236",
+"reason": "攻擊性批評"
+},
+{
+"text": "準時走有咩問題?",
+"id": "00_employee_dialogue",
+"context_post_id": "230",
+"reason": "嚴肅反問"
+},
+{
+"text": "omg啱啱瞓醒點解咁多人嘅😱😱",
+"id": "fuxkmylife0503_comment",
+"context_post_id": "235",
+"reason": "驚訝/情緒表達"
+},
+{
+"text": "祝你哋幸福!",
+"id": "raymond.1022_comment",
+"context_post_id": "351",
+"reason": "真誠祝福"
+}
+],
+"scoring_hints": {
+"lexical_cues": ["笑死", "頂住檔先", "特務", "🤣", "😂", "哈哈", "我分啲肉俾你"],
+"symbolic_cues": ["荒謬的場景假設", "引用流行文化", "無惡意的誇張"]
+}
+},
+{
+"axis_name": "Envy_SelfDeprecation",
+"definition": "表達羨慕、嫉妒（通常是開玩笑的），或透過貶低自己來襯托他人/現狀。",
+"stats": {
+"pos_count": 20,
+"unique_source_posts": 6
+},
+"pos_examples": [
+{
+"text": "死啦 人地13歲着到廿幾歲甘 我就泥30歲 仲好似13歲咁",
+"id": "bdedd079710af5b5febe6456fc55e6933f3917503d25fc278b54a3ef26f66a63",
+"context_post_id": "355",
+"context_summary": "13歲女生外表成熟",
+"reason": "透過自嘲年齡與外表不符來表達驚訝"
+},
+{
+"text": "我都想真係有拖拍😔",
+"id": "lzq.*.0306_comment",
+"context_post_id": "233",
+"context_summary": "女生分享男友",
+"reason": "直接表達羨慕與孤單"
+},
+{
+"text": "遇到呢啲人只有一種，佢係gay",
+"id": "kai_123_peace_comment",
+"context_post_id": "233",
+"context_summary": "女生分享完美男友",
+"reason": "出於嫉妒或難以置信而否定現實 (Sour Grapes)"
+},
+{
+"text": "爭啲想講congrats...😭",
+"id": "wwing16_comment",
+"context_post_id": "233",
+"context_summary": "女生分享男友",
+"reason": "暗示自己以為樓主是單身狗（同病相憐），結果失望"
+},
+{
+"text": "養隻寵物可以滿足你上述要求",
+"id": "sonia_ta_so_comment",
+"context_post_id": "233",
+"context_summary": "女生分享完美男友",
+"reason": "酸溜溜的建議，暗示完美男人不存在"
+},
+{
+"text": "D女比你哋溝哂 點算",
+"id": "darren__ling3314_comment",
+"context_post_id": "232",
+"context_summary": "中學生穿西裝",
+"reason": "以誇張的嫉妒來稱讚（或調侃）樓主"
+},
+{
+"text": "幾時到我🫩",
+"id": "doremi7214lywc.link_comment",
+"context_post_id": "237",
+"context_summary": "60歲女士獲樂悠卡",
+"reason": "羨慕別人的優惠/退休生活"
+},
+{
+"text": "羨慕",
+"id": "yvonnekok8_comment",
+"context_post_id": "237",
+"context_summary": "60歲女士獲樂悠卡",
+"reason": "直接表達羨慕"
+},
+{
+"text": "我希望快些到65有生果金啦，有養生實際似2x, 我4x了，心態似3x.",
+"id": "cathycheungxkt_comment",
+"context_post_id": "237",
+"context_summary": "60歲女士獲樂悠卡",
+"reason": "藉由羨慕表達自己的年齡焦慮與現狀"
+},
+{
+"text": "只係到咗中年、仲有60年捱",
+"id": "josephmakwai_comment",
+"context_post_id": "237",
+"context_summary": "60歲女士獲樂悠卡",
+"reason": "對自身還需要工作的無奈自嘲"
+},
+{
+"text": "想像00後妹豬已經兩蚊嘅日子",
+"id": "top_model_slayyy_comment",
+"context_post_id": "237",
+"context_summary": "60歲女士獲樂悠卡",
+"reason": "對時間流逝的感嘆"
+},
+{
+"text": "死啦我18歲我睇落去似13 ￼🤡",
+"id": "c335443593f9dee90d46c844c14eb0ac65f2e744278ad6561fc08d0a77b317fc",
+"context_post_id": "355",
+"context_summary": "13歲女生外表成熟",
+"reason": "自嘲外表幼稚"
+},
+{
+"text": "我肥左5kg 對波都無大到 🫠",
+"id": "qwertyyuiopa_a0x0_comment",
+"context_post_id": "354",
+"context_summary": "女生求增肥/豐胸",
+"reason": "悲慘的個人經驗分享（自嘲）"
+},
+{
+"text": "好好享受吧 30歲後你會後悔當初為何要增肥",
+"id": "kncalvin_comment",
+"context_post_id": "354",
+"context_summary": "女生求增肥",
+"reason": "基於自身（變老/變肥）經驗的警世自嘲"
+},
+{
+"text": "我43 好期待拎生果金， 有玩開養生， 諗住拎五十年以上生果金。",
+"id": "jackycheungsing_comment",
+"context_post_id": "237",
+"context_summary": "60歲女士獲樂悠卡",
+"reason": "對未來的羨慕與規劃"
+},
+{
+"text": "威啦威啦😭",
+"id": "whatsyourproblemhah_comment",
+"context_post_id": "351",
+"context_summary": "求婚放閃",
+"reason": "半開玩笑的嫉妒（你最厲害了，我沒有）"
+},
+{
+"text": "阿叔我90年代，毛都未出聽許冠傑... 知道自己中文程度不逮",
+"id": "kwoklapyin_comment",
+"context_post_id": "236",
+"context_summary": "新聞用字「蹤杳」",
+"reason": "以自稱「阿叔」和承認不足來進行說教"
+},
+{
+"text": "我都想真係有拖拍😔",
+"id": "lzq.*.0306_comment",
+"context_post_id": "233",
+"context_summary": "女生分享男友",
+"reason": "重複確認：直接的情感流露"
+},
+{
+"text": "23望落似33",
+"id": "saitamasenshi_comment",
+"context_post_id": "355",
+"context_summary": "13歲女生外表成熟",
+"reason": "自嘲（或嘲諷他人）老得快"
+},
+{
+"text": "反正冇嘢做不如同我一齊複製貼上做白日夢",
+"id": "233_post_body",
+"context_post_id": "233",
+"context_summary": "女生分享男友",
+"reason": "樓主最後自揭是「白日夢」，屬於極致的自嘲（雖然可能是copypasta）"
+}
+],
+"neg_examples": [
+{
+"text": "恭喜！恭喜 !",
+"id": "apr6656_comment",
+"context_post_id": "237",
+"reason": "單純祝賀"
+},
+{
+"text": "我覺得啱喎，準時返工就應該準時放工",
+"id": "kiss.theguy_comment",
+"context_post_id": "230",
+"reason": "立場堅定，無自卑感"
+},
+{
+"text": "無錢俾重要衝入廚房擸刀，果然係五千年文化",
+"id": "da785..._comment",
+"context_post_id": "360",
+"reason": "攻擊他人，非自嘲"
+},
+{
+"text": "LM",
+"id": "1emoon28.*_comment",
+"context_post_id": "235",
+"reason": "需求表達"
+},
+{
+"text": "染髮樽一定係裝染髮劑",
+"id": "billy.li.16752_comment",
+"context_post_id": "234",
+"reason": "事實陳述"
+},
+{
+"text": "文盲 書又唔讀",
+"id": "hahago333_comment",
+"context_post_id": "236",
+"reason": "罵人"
+},
+{
+"text": "拍得超好，超浪漫，祝你們幸福💙",
+"id": "kikiwong_0229_comment",
+"context_post_id": "351",
+"reason": "讚美"
+},
+{
+"text": "我153，未尖前未試過over 45kg 而家終於可以上到56kg",
+"id": "foksherman_comment",
+"context_post_id": "354",
+"reason": "成功經驗分享"
+}
+],
+"scoring_hints": {
+"lexical_cues": ["羨慕", "我就...", "死啦", "我係廢老", "幾時到我", "😭", "😔", "酸"],
+"symbolic_cues": ["自稱阿叔/嬸嬸/小妹", "對比他人優勢"]
+}
+},
+{
+"axis_name": "Critical_Judgment",
+"definition": "嚴肅、直接地表達不滿、反對意見或糾正錯誤，通常帶有道德判斷或邏輯批判，不一定使用幽默或諷刺。",
+"stats": {
+"pos_count": 20,
+"unique_source_posts": 6
+},
+"pos_examples": [
+{
+"text": "失蹤咪失蹤囉，學文言文嗎？",
+"id": "236_post_body",
+"context_post_id": "236",
+"context_summary": "新聞用字「蹤杳」",
+"reason": "直接批評用詞不當"
+},
+{
+"text": "我以前做過記者... 新聞傳播係應該用最淺白嘅用字... 而家記者太多錯字了",
+"id": "kevinlau0207_comment",
+"context_post_id": "236",
+"context_summary": "新聞用字「蹤杳」",
+"reason": "基於專業標準的嚴肅批評"
+},
+{
+"text": "點解而家啲人普遍鍾意無知仲要擺上網話俾大家知？",
+"id": "chai_ho0915_comment",
+"context_post_id": "236",
+"context_summary": "樓主批評新聞用字深",
+"reason": "批判「以無知為榮」的社會現象"
+},
+{
+"text": "呢幾年點解多左咁多以無知為榮嘅人",
+"id": "stingyhomekongers_comment",
+"context_post_id": "236",
+"context_summary": "樓主批評新聞用字深",
+"reason": "對社會風氣的批判"
+},
+{
+"text": "媒體並無責任曲意奉迎樓主呢類識字文盲。",
+"id": "chrisssss2036_comment",
+"context_post_id": "236",
+"context_summary": "樓主批評新聞用字深",
+"reason": "嚴厲指責樓主的無理要求"
+},
+{
+"text": "唔建議用$2搭車仲自稱小姐 你會令我唔知點稱呼其他年輕女性",
+"id": "elveny__comment",
+"context_post_id": "237",
+"context_summary": "60歲女士自稱小姐",
+"reason": "對稱謂使用的不滿與糾正"
+},
+{
+"text": "心理有問題呀！點解要迫人OT？",
+"id": "angie_fok_comment",
+"context_post_id": "230",
+"context_summary": "00後準時收工",
+"reason": "對不合理加班文化的直接抨擊"
+},
+{
+"text": "仲要OT係冇錢",
+"id": "linus.man.1108_comment",
+"context_post_id": "230",
+"context_summary": "00後準時收工",
+"reason": "指出核心不合理之處"
+},
+{
+"text": "搵笨",
+"id": "angie_fok_comment_2",
+"context_post_id": "230",
+"context_summary": "00後準時收工",
+"reason": "簡短有力的負面評價"
+},
+{
+"text": "效率高都要比人小😅",
+"id": "yuendicedice_comment",
+"context_post_id": "230",
+"context_summary": "00後準時收工",
+"reason": "對管理層邏輯的不滿"
+},
+{
+"text": "啲老屎窟個腦唔知點構造 坐喺公司唔走等於勤力",
+"id": "thprebu_comment",
+"context_post_id": "230",
+"context_summary": "00後準時收工",
+"reason": "對舊思維的強烈批判"
+},
+{
+"text": "太粗疏啦",
+"id": "filet.fish.94_comment",
+"context_post_id": "231",
+"context_summary": "新聞四捨五入時間",
+"reason": "直接批評工作品質"
+},
+{
+"text": "點解未起好就開?",
+"id": "yiji.k_comment",
+"context_post_id": "231",
+"context_summary": "新聞四捨五入時間",
+"reason": "質疑決策邏輯"
+},
+{
+"text": "成條開晒先講啦 開得一半點計",
+"id": "joe_ctl_comment",
+"context_post_id": "231",
+"context_summary": "新聞四捨五入時間",
+"reason": "批評計算基準不合理"
+},
+{
+"text": "無線新聞是是但但",
+"id": "hahahakit_comment",
+"context_post_id": "231",
+"context_summary": "新聞四捨五入時間",
+"reason": "引用口號批評特定媒體"
+},
+{
+"text": "煙 酒 太空油 🙈",
+"id": "7492309f3c809a63899447f728a047dd2c1a01b13da639d809f01e38d5cf42be",
+"context_post_id": "355",
+"context_summary": "13歲女生外表成熟",
+"reason": "暗示並批判不良嗜好導致的問題"
+},
+{
+"text": "最主要係打扮, 仲要化到個妝好似出嚟撈咁。呢啲靚妹通常好細個已經冇曬童真",
+"id": "sirtaromonkey_comment",
+"context_post_id": "355",
+"context_summary": "13歲女生外表成熟",
+"reason": "道德批判與審美批評"
+},
+{
+"text": "當以醜為美，以￼無知為榮普遍地說成理所當然，這個地方的教育￼可以說是很失敗。",
+"id": "brianyung1606_comment",
+"context_post_id": "236",
+"context_summary": "新聞用字「蹤杳」",
+"reason": "上升到教育層面的系統性批判"
+},
+{
+"text": "由此po可見，香港就嚟出產大量文盲... 繁體字就咁係香港消失",
+"id": "almaaachiuuu_comment",
+"context_post_id": "236",
+"context_summary": "新聞用字「蹤杳」",
+"reason": "對文化傳承的擔憂與批判"
+},
+{
+"text": "不要增肥 你絕對會後悔",
+"id": "lee.*.kt_comment",
+"context_post_id": "354",
+"context_summary": "女生求增肥",
+"reason": "強烈的反對意見"
+}
+],
+"neg_examples": [
+{
+"text": "無錢俾重要衝入廚房擸刀，果然係五千年文化",
+"id": "da785..._comment",
+"context_post_id": "360",
+"reason": "這是諷刺(Sarcasm)，非直接嚴肅批評"
+},
+{
+"text": "文盲 書又唔讀",
+"id": "hahago333_comment",
+"context_post_id": "236",
+"reason": "這是嘲弄/謾罵(Mockery/Insult)"
+},
+{
+"text": "杯老麥咖啡畫龍點睛",
+"id": "nopartyfor__comment",
+"context_post_id": "232",
+"reason": "這是嘲笑(Mockery)"
+},
+{
+"text": "大家唔好亂屌住",
+"id": "wilcuswu_comment",
+"context_post_id": "237",
+"reason": "這是呼籲/反諷，非批評"
+},
+{
+"text": "其實這個字並非生僻字... 只要平時多閱讀...便會見到",
+"id": "eriko.kitayama_comment",
+"context_post_id": "236",
+"reason": "這是解釋/教育(Analytical)"
+},
+{
+"text": "恭喜哂嬸嬸",
+"id": "x.jor_m_comment",
+"context_post_id": "237",
+"reason": "這是祝賀"
+},
+{
+"text": "LM",
+"id": "1emoon28.*_comment",
+"context_post_id": "235",
+"reason": "這是請求"
+},
+{
+"text": "真係會有人睇咩😂",
+"id": "fuxkmylife0503_reply",
+"context_post_id": "235",
+"reason": "這是疑問/自嘲"
+}
+],
+"scoring_hints": {
+"lexical_cues": ["唔建議", "點解要", "失敗", "無知", "粗疏", "唔應該", "有問題"],
+"symbolic_cues": ["🙄", "😤", "句號作結"]
+}
+}
+]
+}

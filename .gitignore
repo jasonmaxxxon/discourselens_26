@@ -1,0 +1,14 @@
+.env
+.env.*
+!.env.example
+.DS_Store
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+node_modules/
+dist/
+logs/
+artifacts/
+reports/
+auth_threads.json
