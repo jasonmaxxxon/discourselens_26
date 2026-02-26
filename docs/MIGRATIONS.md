@@ -124,3 +124,14 @@ For full DDL, read the SQL files themselves.
 - `supabase/migrations/20260209040000_cdx_reply_matrix_accounting.sql`
   - create table: public.threads_reply_matrix_audits
 
+- `supabase/migrations/20260223000000_casebook_snapshot.sql`
+  - create table: public.analyst_casebook
+
+- `supabase/migrations/20260223010000_casebook_forensic_hardening.sql`
+  - alter table: public.analyst_casebook
+  - create trigger/function: snapshot immutability enforcement
+
+- `supabase/migrations/20260226150000_topic_engine_phase2_sot.sql`
+  - create table: public.topic_runs, public.topic_posts, public.topic_meta_clusters, public.topic_lifecycle_daily
+  - create indexes: topic run/meta/lifecycle query paths
+  - add FK: topic_lifecycle_daily(topic_run_id, meta_cluster_key) -> topic_meta_clusters

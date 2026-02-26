@@ -465,3 +465,91 @@ Columns:
 - `created_at`: timestamp with time zone DEFAULT "now"()
 - `updated_at`: timestamp with time zone DEFAULT "now"()
 
+## public.topic_runs
+Immutable topic snapshot runs (Phase-2 provisioned).
+
+_Sources: supabase/migrations/20260226150000_topic_engine_phase2_sot.sql_
+
+Columns:
+- `id`: uuid primary key default gen_random_uuid()
+- `topic_name`: text not null
+- `seed_query`: text
+- `seed_post_ids`: jsonb not null default []
+- `time_range_start`: timestamptz not null
+- `time_range_end`: timestamptz not null
+- `run_params`: jsonb not null default {}
+- `topic_run_hash`: text not null unique
+- `lifecycle_hash`: text
+- `status`: text not null default 'pending'
+- `source`: text not null default 'manual'
+- `freshness_lag_seconds`: int
+- `coverage_gap`: boolean not null default false
+- `stats_json`: jsonb not null default {}
+- `error_summary`: text
+- `created_by`: text
+- `created_at`: timestamptz not null default now()
+- `started_at`: timestamptz
+- `finished_at`: timestamptz
+- `updated_at`: timestamptz not null default now()
+
+## public.topic_posts
+Post membership rows for a topic run (Phase-2 provisioned).
+
+_Sources: supabase/migrations/20260226150000_topic_engine_phase2_sot.sql_
+
+Columns:
+- `id`: bigserial primary key
+- `topic_run_id`: uuid not null references public.topic_runs(id) on delete cascade
+- `post_id`: bigint not null references public.threads_posts(id) on delete cascade
+- `ordinal`: int not null default 0
+- `inclusion_source`: text not null default 'seed'
+- `inclusion_reason`: text
+- `post_created_at`: timestamptz
+- `cluster_run_id`: text
+- `post_cluster_count`: int not null default 0
+- `comments_total`: int not null default 0
+- `evidence_total`: int not null default 0
+- `coverage_ratio`: double precision
+- `weights_json`: jsonb not null default {}
+- `created_at`: timestamptz not null default now()
+
+## public.topic_meta_clusters
+Cross-post meta-clusters for a topic run (Phase-2 provisioned).
+
+_Sources: supabase/migrations/20260226150000_topic_engine_phase2_sot.sql_
+
+Columns:
+- `id`: uuid primary key default gen_random_uuid()
+- `topic_run_id`: uuid not null references public.topic_runs(id) on delete cascade
+- `meta_cluster_key`: int not null
+- `meta_cluster_hash`: text not null
+- `centroid_embedding_384`: vector(384)
+- `member_clusters`: jsonb not null default []
+- `member_posts`: jsonb not null default []
+- `dominance_share`: double precision not null default 0
+- `comment_count`: int not null default 0
+- `evidence_count`: int not null default 0
+- `metrics_json`: jsonb not null default {}
+- `created_at`: timestamptz not null default now()
+- `updated_at`: timestamptz not null default now()
+
+## public.topic_lifecycle_daily
+Daily lifecycle rows by topic run + meta-cluster (Phase-2 provisioned).
+
+_Sources: supabase/migrations/20260226150000_topic_engine_phase2_sot.sql_
+
+Columns:
+- `id`: bigserial primary key
+- `topic_run_id`: uuid not null references public.topic_runs(id) on delete cascade
+- `meta_cluster_key`: int not null
+- `day_utc`: date not null
+- `dominance_share`: double precision not null default 0
+- `comment_count`: int not null default 0
+- `evidence_count`: int not null default 0
+- `managed_score`: double precision not null default 0
+- `organic_score`: double precision not null default 0
+- `drift_score`: double precision not null default 0
+- `lifecycle_stage`: text not null default 'birth'
+- `supporting_post_ids`: jsonb not null default []
+- `metrics_json`: jsonb not null default {}
+- `created_at`: timestamptz not null default now()

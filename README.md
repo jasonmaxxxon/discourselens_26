@@ -15,10 +15,16 @@ Threads 貼文抓取 + Supabase SoT + deterministic preanalysis + claims-only LL
 - `docs/FLOWS.md`
 - `docs/ENDPOINTS.md`
 - `docs/CONTRACTS.md`
+- `docs/TOPIC_CONTRACT_V1.md`
 - `docs/SCHEMA.md`
 - `docs/MIGRATIONS.md`
 - `docs/ARCHITECTURE.md`
 - `docs/DEV_RUNBOOK.md`
+
+**Topic Engine 現況（2026-02-26）**
+- 已落地：Topic Contract v1、Phase-2 Topic SoT migration（`topic_runs/topic_posts/topic_meta_clusters/topic_lifecycle_daily`）。
+- 尚未落地：`/api/topics/*` 讀寫路由與 Topic UI 專屬頁面。
+- Hash contract/golden check：`python3 scripts/verify_topic_contract_golden.py`
 
 **主流程骨幹（S1–S6）**
 1. S1 Fetch + Ingest (SoT)
@@ -46,11 +52,9 @@ Threads 貼文抓取 + Supabase SoT + deterministic preanalysis + claims-only LL
 - REST API：`/api/jobs/*`（取代 legacy in-memory jobs）
 
 **Frontend 路由（React）**
-- `/ops/vitals` System Vitals
-- `/ops/jobs` Logistics Dashboard
-- `/ops/dashboard` Ops Dashboard
-- `/pipeline/a|b|c` Legacy Pipeline UI
-- `/archive` / `/narrative/:postId` Narrative UI（僅顯示現有資料）
+- 主路由（Stitch）：`/overview`, `/pipeline`, `/insights`, `/library`, `/review`
+- Legacy 路由：`/legacy/overview`, `/legacy/pipeline`, `/legacy/insights`, `/legacy/library`, `/legacy/review`
+- UI 現況：目前仍以 post-centric 工作流為主（Detect/Investigate/Compare），Topic 專屬操作尚未接入。
 
 **Quick Start（macOS / zsh）**
 Backend
@@ -89,6 +93,11 @@ python3 scripts/run_fetcher_and_ingest.py "<threads_url>" --headless
 **Preanalysis（deterministic）**
 ```bash
 python3 scripts/run_preanalysis.py --post-id 410 --prefer-sot --persist-assignments
+```
+
+**Topic Contract Golden Check**
+```bash
+PYTHONPATH=. python3 scripts/verify_topic_contract_golden.py
 ```
 
 **Docker（fetch + ingest）**
