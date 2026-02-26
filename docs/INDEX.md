@@ -9,6 +9,7 @@ This folder is the single source of truth for how the system works. A new engine
 ## API and Contracts
 - `docs/ENDPOINTS.md` — All HTTP endpoints (JSON + HTML console).
 - `docs/CONTRACTS.md` — JSON contracts for artifacts, preanalysis, analysis_json, claims, risk, and ops KPI.
+- `docs/TOPIC_CONTRACT_V1.md` — Deterministic Topic Engine v1 input/output/hash/gate contracts.
 
 ## Database
 - `docs/SCHEMA.md` — Current tables and columns (derived from migrations and schema export).
