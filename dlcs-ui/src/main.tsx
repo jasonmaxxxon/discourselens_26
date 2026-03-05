@@ -1,10 +1,24 @@
-import React from "react";
 import ReactDOM from "react-dom/client";
-import "./index.css";
-import App from "./App";
+import { BrowserRouter } from "react-router-dom";
+import { App } from "./App";
+import { AppErrorBoundary } from "./components/AppErrorBoundary";
+import { useIntelligenceStore } from "./store/intelligenceStore";
+import "./styles/app.css";
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+async function bootstrap() {
+  try {
+    await useIntelligenceStore.persist.rehydrate();
+  } catch {
+    // Continue rendering even when persisted data is unavailable.
+  }
+
+  ReactDOM.createRoot(document.getElementById("root")!).render(
+    <AppErrorBoundary>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </AppErrorBoundary>
+  );
+}
+
+void bootstrap();

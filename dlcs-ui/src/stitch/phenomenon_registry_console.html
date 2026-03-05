@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Glass Phenomenon Registry</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "glass-border": "rgba(255, 255, 255, 0.4)",
+                        "glass-surface": "rgba(255, 255, 255, 0.65)",
+                        "glass-highlight": "rgba(255, 255, 255, 0.9)",
+                        "primary": "#8b5cf6","primary-hover": "#7c3aed",
+                        "primary-light": "rgba(139, 92, 246, 0.1)",
+                        "text-main": "#334155",
+                        "text-muted": "#64748b",
+                        "accent-green": "#34d399",
+                        "accent-amber": "#fbbf24",
+                        "accent-red": "#f87171",
+                        "accent-cyan": "#22d3ee",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"],
+                    },
+                    boxShadow: {
+                        "glass": "0 4px 30px rgba(0, 0, 0, 0.1)",
+                        "glass-sm": "0 2px 10px rgba(0, 0, 0, 0.05)",
+                        "glow": "0 0 15px rgba(139, 92, 246, 0.3)",
+                    },
+                    backdropBlur: {
+                        "xs": "2px",
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 50%, #f3e8ff 100%);
+            background-attachment: fixed;
+        }::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(139, 92, 246, 0.2); 
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(139, 92, 246, 0.4); 
+        }
+        .truncate-middle {
+            display: inline-block;
+            max-width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }.glass-row {
+            transition: all 0.2s ease;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-bottom: 1px solid rgba(255,255,255,0.4);
+        }
+        .glass-row:hover {
+            background-color: rgba(255, 255, 255, 0.7);
+            transform: scale-[1.001];
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.08);
+            z-index: 10;
+            position: relative;
+        }.floating-glass {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }.status-dot {
+            box-shadow: 0 0 8px currentColor;
+        }
+    </style>
+</head>
+<body class="text-text-main font-display min-h-screen flex flex-col overflow-hidden selection:bg-primary/20">
+<header class="h-16 flex items-center justify-between px-6 shrink-0 z-30 m-4 mb-0 rounded-2xl floating-glass shadow-glass-sm">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-3">
+<div class="p-1.5 bg-primary/10 rounded-lg shadow-[0_0_15px_rgba(139,92,246,0.2)]">
+<span class="material-symbols-outlined text-primary text-[22px]">hub</span>
+</div>
+<h1 class="text-base font-semibold tracking-tight text-slate-700">Phenomenon Registry <span class="text-xs text-primary/80 font-medium ml-2 px-2 py-0.5 rounded-full bg-primary/5 border border-primary/10">v.2.4.1</span></h1>
+</div>
+<div class="h-6 w-px bg-slate-300/50 mx-2"></div>
+<nav class="flex items-center gap-1">
+<a class="text-xs font-medium text-primary bg-primary/5 px-3 py-1.5 rounded-full border border-primary/10" href="#">Registry</a>
+<a class="text-xs font-medium text-text-muted hover:text-text-main hover:bg-white/40 px-3 py-1.5 rounded-full transition-all" href="#">Analysis</a>
+<a class="text-xs font-medium text-text-muted hover:text-text-main hover:bg-white/40 px-3 py-1.5 rounded-full transition-all" href="#">Governance</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+<span class="material-symbols-outlined text-[18px]">search</span>
+</div>
+<input class="bg-white/40 border border-white/60 text-slate-600 text-xs rounded-xl block w-64 pl-9 p-2 focus:ring-2 focus:ring-primary/20 focus:border-primary/30 placeholder-slate-400 shadow-inner backdrop-blur-sm transition-all hover:bg-white/60" placeholder="Search hash, ID, or tag..." type="text"/>
+<div class="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none">
+<span class="text-[10px] text-slate-400 border border-slate-300/50 rounded px-1.5 bg-white/30">⌘K</span>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button class="text-slate-500 hover:text-primary p-2 rounded-full hover:bg-primary/5 transition-colors">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+</button>
+<button class="text-slate-500 hover:text-primary p-2 rounded-full hover:bg-primary/5 transition-colors">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+</button>
+<div class="h-9 w-9 bg-gradient-to-br from-primary to-purple-400 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-lg shadow-primary/20 ml-2 border-2 border-white" data-alt="User avatar gradient">
+                JS
+            </div>
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden relative p-4 gap-4">
+<aside class="w-16 rounded-2xl floating-glass flex flex-col items-center py-6 gap-6 shrink-0 z-20 shadow-glass-sm">
+<button class="w-10 h-10 flex items-center justify-center rounded-xl text-primary bg-primary/10 shadow-[inset_0_0_10px_rgba(139,92,246,0.1)] border border-primary/20 transition-all hover:scale-105">
+<span class="material-symbols-outlined text-[22px]">database</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-400 hover:text-primary hover:bg-white/60 transition-all">
+<span class="material-symbols-outlined text-[22px]">monitoring</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-400 hover:text-primary hover:bg-white/60 transition-all">
+<span class="material-symbols-outlined text-[22px]">security</span>
+</button>
+<div class="w-8 h-px bg-slate-300/50 my-1"></div>
+<button class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-400 hover:text-primary hover:bg-white/60 transition-all">
+<span class="material-symbols-outlined text-[22px]">folder</span>
+</button>
+</aside>
+<main class="flex-1 flex flex-col min-w-0 rounded-2xl bg-white/20 border border-white/30 backdrop-blur-sm relative shadow-glass overflow-hidden">
+<div class="h-14 border-b border-white/30 flex items-center justify-between px-6 bg-white/10 shrink-0">
+<div class="flex items-center gap-4">
+<h2 class="text-sm font-semibold text-slate-700">Active Phenomena</h2>
+<span class="bg-primary/10 text-primary text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border border-primary/20 shadow-sm">12,482</span>
+<div class="h-4 w-px bg-slate-300/50 mx-1"></div>
+<button class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-white/50 rounded-lg border border-transparent hover:border-white/50 transition-all">
+<span class="material-symbols-outlined text-[16px] text-slate-500">filter_list</span>
+                    Filter
+                </button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-white/50 rounded-lg border border-transparent hover:border-white/50 transition-all">
+<span class="material-symbols-outlined text-[16px] text-slate-500">sort</span>
+                    Sort
+                </button>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-[10px] text-slate-500 mr-2 bg-white/30 px-2 py-0.5 rounded-md">Last updated: 14s ago</span>
+<button class="p-2 rounded-lg hover:bg-white/50 text-slate-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">refresh</span>
+</button>
+<button class="p-2 rounded-lg hover:bg-white/50 text-slate-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">download</span>
+</button>
+</div>
+</div>
+<div class="flex-1 overflow-auto custom-scrollbar">
+<table class="w-full text-left border-collapse">
+<thead class="sticky top-0 z-10 bg-white/70 backdrop-blur-md shadow-sm">
+<tr>
+<th class="px-6 py-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider border-b border-white/40 w-[60px]">
+<input class="rounded border-slate-300 bg-white/50 text-primary focus:ring-offset-0 focus:ring-primary/30 h-3.5 w-3.5" type="checkbox"/>
+</th>
+<th class="px-6 py-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider border-b border-white/40">Canonical Phenomenon</th>
+<th class="px-6 py-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider border-b border-white/40 text-right">Occurrence Count</th>
+<th class="px-6 py-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider border-b border-white/40">Last Seen (ISO)</th>
+<th class="px-6 py-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider border-b border-white/40">Fingerprint Hash</th>
+<th class="px-6 py-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider border-b border-white/40">Stability</th>
+<th class="px-6 py-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider border-b border-white/40 text-right">Risk Level</th>
+<th class="px-6 py-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider border-b border-white/40 w-[40px]"></th>
+</tr>
+</thead>
+<tbody class="text-xs">
+<tr class="glass-row group cursor-pointer">
+<td class="px-6 py-3">
+<input class="rounded border-slate-300 bg-white/50 text-primary focus:ring-offset-0 focus:ring-primary/30 h-3.5 w-3.5" type="checkbox"/>
+</td>
+<td class="px-6 py-3 font-medium text-slate-700">
+<div class="flex items-center gap-2">
+<div class="p-1 rounded bg-primary/10 text-primary">
+<span class="material-symbols-outlined text-[14px]">token</span>
+</div>
+                                PHN-992-Alpha
+                            </div>
+</td>
+<td class="px-6 py-3 font-mono text-slate-500 text-right">14,203</td>
+<td class="px-6 py-3 font-mono text-slate-500">2023-10-27T08:42:00Z</td>
+<td class="px-6 py-3 font-mono text-slate-400" title="0x4f129384756281938471928374650a1">0x4f...a1</td>
+<td class="px-6 py-3">
+<div class="flex items-center gap-2">
+<div class="h-2 w-2 rounded-full bg-accent-green status-dot text-accent-green"></div>
+<span class="text-slate-600 font-medium">Stable</span>
+</div>
+</td>
+<td class="px-6 py-3 text-right">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-accent-red/10 text-accent-red border border-accent-red/20 shadow-sm">
+                                High
+                            </span>
+</td>
+<td class="px-6 py-3 text-right opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-[16px] text-slate-400 hover:text-slate-700">more_horiz</span>
+</td>
+</tr>
+<tr class="glass-row group cursor-pointer">
+<td class="px-6 py-3">
+<input class="rounded border-slate-300 bg-white/50 text-primary focus:ring-offset-0 focus:ring-primary/30 h-3.5 w-3.5" type="checkbox"/>
+</td>
+<td class="px-6 py-3 font-medium text-slate-700">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px] text-slate-400">token</span>
+                                PHN-881-Beta
+                            </div>
+</td>
+<td class="px-6 py-3 font-mono text-slate-500 text-right">4,102</td>
+<td class="px-6 py-3 font-mono text-slate-500">2023-10-27T08:45:11Z</td>
+<td class="px-6 py-3 font-mono text-slate-400" title="0x3b129384756281938471928374650c2">0x3b...c2</td>
+<td class="px-6 py-3">
+<div class="flex items-center gap-2">
+<div class="h-2 w-2 rounded-full bg-accent-amber status-dot text-accent-amber"></div>
+<span class="text-slate-600 font-medium">Volatile</span>
+</div>
+</td>
+<td class="px-6 py-3 text-right">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-accent-amber/10 text-accent-amber border border-accent-amber/20 shadow-sm">
+                                Medium
+                            </span>
+</td>
+<td class="px-6 py-3 text-right opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-[16px] text-slate-400 hover:text-slate-700">more_horiz</span>
+</td>
+</tr>
+<tr class="glass-row group cursor-pointer">
+<td class="px-6 py-3">
+<input class="rounded border-slate-300 bg-white/50 text-primary focus:ring-offset-0 focus:ring-primary/30 h-3.5 w-3.5" type="checkbox"/>
+</td>
+<td class="px-6 py-3 font-medium text-slate-700">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px] text-slate-400">token</span>
+                                PHN-773-Gamma
+                            </div>
+</td>
+<td class="px-6 py-3 font-mono text-slate-500 text-right">12,993</td>
+<td class="px-6 py-3 font-mono text-slate-500">2023-10-26T14:20:00Z</td>
+<td class="px-6 py-3 font-mono text-slate-400" title="0x1a129384756281938471928374650f9">0x1a...f9</td>
+<td class="px-6 py-3">
+<div class="flex items-center gap-2">
+<div class="h-2 w-2 rounded-full bg-accent-red status-dot text-accent-red"></div>
+<span class="text-slate-600 font-medium">Degrading</span>
+</div>
+</td>
+<td class="px-6 py-3 text-right">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-accent-red/10 text-accent-red border border-accent-red/20 shadow-sm">
+                                Critical
+                            </span>
+</td>
+<td class="px-6 py-3 text-right opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-[16px] text-slate-400 hover:text-slate-700">more_horiz</span>
+</td>
+</tr>
+<tr class="glass-row group cursor-pointer">
+<td class="px-6 py-3">
+<input class="rounded border-slate-300 bg-white/50 text-primary focus:ring-offset-0 focus:ring-primary/30 h-3.5 w-3.5" type="checkbox"/>
+</td>
+<td class="px-6 py-3 font-medium text-slate-700">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px] text-slate-400">token</span>
+                                PHN-551-Delta
+                            </div>
+</td>
+<td class="px-6 py-3 font-mono text-slate-500 text-right">234</td>
+<td class="px-6 py-3 font-mono text-slate-500">2023-10-26T11:00:00Z</td>
+<td class="px-6 py-3 font-mono text-slate-400" title="0x9e129384756281938471928374650d4">0x9e...d4</td>
+<td class="px-6 py-3">
+<div class="flex items-center gap-2">
+<div class="h-2 w-2 rounded-full bg-accent-green status-dot text-accent-green"></div>
+<span class="text-slate-600 font-medium">Stable</span>
+</div>
+</td>
+<td class="px-6 py-3 text-right">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-500 border border-slate-300 shadow-sm">
+                                Low
+                            </span>
+</td>
+<td class="px-6 py-3 text-right opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-[16px] text-slate-400 hover:text-slate-700">more_horiz</span>
+</td>
+</tr>
+<tr class="glass-row group cursor-pointer">
+<td class="px-6 py-3">
+<input class="rounded border-slate-300 bg-white/50 text-primary focus:ring-offset-0 focus:ring-primary/30 h-3.5 w-3.5" type="checkbox"/>
+</td>
+<td class="px-6 py-3 font-medium text-slate-700">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px] text-slate-400">token</span>
+                                PHN-332-Epsilon
+                            </div>
+</td>
+<td class="px-6 py-3 font-mono text-slate-500 text-right">9,001</td>
+<td class="px-6 py-3 font-mono text-slate-500">2023-10-25T16:30:45Z</td>
+<td class="px-6 py-3 font-mono text-slate-400" title="0x2c129384756281938471928374650b8">0x2c...b8</td>
+<td class="px-6 py-3">
+<div class="flex items-center gap-2">
+<div class="h-2 w-2 rounded-full bg-accent-cyan status-dot text-accent-cyan"></div>
+<span class="text-slate-600 font-medium">Analyzing</span>
+</div>
+</td>
+<td class="px-6 py-3 text-right">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-500 border border-slate-300 shadow-sm">
+                                Low
+                            </span>
+</td>
+<td class="px-6 py-3 text-right opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-[16px] text-slate-400 hover:text-slate-700">more_horiz</span>
+</td>
+</tr>
+<tr class="glass-row group cursor-pointer">
+<td class="px-6 py-3"><input class="rounded border-slate-300 bg-white/50 text-primary focus:ring-offset-0 focus:ring-primary/30 h-3.5 w-3.5" type="checkbox"/></td>
+<td class="px-6 py-3 font-medium text-slate-700"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-[14px] text-slate-400">token</span>PHN-119-Zeta</div></td>
+<td class="px-6 py-3 font-mono text-slate-500 text-right">1,220</td>
+<td class="px-6 py-3 font-mono text-slate-500">2023-10-25T09:15:00Z</td>
+<td class="px-6 py-3 font-mono text-slate-400">0x6d...e1</td>
+<td class="px-6 py-3"><div class="flex items-center gap-2"><div class="h-2 w-2 rounded-full bg-slate-400"></div><span class="text-slate-600 font-medium">Unknown</span></div></td>
+<td class="px-6 py-3 text-right"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-accent-amber/10 text-accent-amber border border-accent-amber/20 shadow-sm">Medium</span></td>
+<td class="px-6 py-3 text-right opacity-0 group-hover:opacity-100 transition-opacity"><span class="material-symbols-outlined text-[16px] text-slate-400 hover:text-slate-700">more_horiz</span></td>
+</tr>
+<tr class="glass-row group cursor-pointer">
+<td class="px-6 py-3"><input class="rounded border-slate-300 bg-white/50 text-primary focus:ring-offset-0 focus:ring-primary/30 h-3.5 w-3.5" type="checkbox"/></td>
+<td class="px-6 py-3 font-medium text-slate-700"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-[14px] text-slate-400">token</span>PHN-004-Eta</div></td>
+<td class="px-6 py-3 font-mono text-slate-500 text-right">56</td>
+<td class="px-6 py-3 font-mono text-slate-500">2023-10-24T18:44:22Z</td>
+<td class="px-6 py-3 font-mono text-slate-400">0x8f...a3</td>
+<td class="px-6 py-3"><div class="flex items-center gap-2"><div class="h-2 w-2 rounded-full bg-accent-green status-dot text-accent-green"></div><span class="text-slate-600 font-medium">Stable</span></div></td>
+<td class="px-6 py-3 text-right"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-500 border border-slate-300 shadow-sm">Low</span></td>
+<td class="px-6 py-3 text-right opacity-0 group-hover:opacity-100 transition-opacity"><span class="material-symbols-outlined text-[16px] text-slate-400 hover:text-slate-700">more_horiz</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="h-12 border-t border-white/30 bg-white/30 backdrop-blur-md flex items-center justify-between px-6 shrink-0">
+<div class="text-[11px] text-slate-500">
+                Showing <span class="font-bold text-slate-700">1-50</span> of <span class="font-bold text-slate-700">12,482</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="text-[11px] text-slate-500 mr-2">Rows per page:</div>
+<select class="bg-white/50 border border-white/60 text-slate-600 text-[11px] rounded-lg h-7 pl-2 pr-6 py-0 focus:ring-1 focus:ring-primary focus:border-primary shadow-sm">
+<option>50</option>
+<option>100</option>
+<option>250</option>
+</select>
+<div class="h-3 w-px bg-slate-300/50 mx-2"></div>
+<button class="h-7 w-7 flex items-center justify-center rounded-lg hover:bg-white/50 text-slate-500 disabled:opacity-30 border border-transparent hover:border-white/60 transition-all">
+<span class="material-symbols-outlined text-[16px]">chevron_left</span>
+</button>
+<button class="h-7 w-7 flex items-center justify-center rounded-lg hover:bg-white/50 text-slate-500 border border-transparent hover:border-white/60 transition-all">
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</div>
+</main>
+<aside class="w-[420px] rounded-[2rem] floating-glass flex flex-col shadow-2xl z-20 shrink-0 ml-2 overflow-hidden border border-white/60 ring-1 ring-white/50">
+<div class="h-20 border-b border-white/40 flex items-center justify-between px-8 shrink-0 bg-white/30 backdrop-blur-xl">
+<div>
+<h3 class="text-lg font-bold text-slate-800 leading-tight tracking-tight">PHN-992-Alpha</h3>
+<div class="flex items-center gap-2 text-[11px] text-slate-500 mt-1">
+<span class="font-mono bg-white/50 px-1.5 rounded text-slate-600">ID: 4920-X82</span>
+<span class="h-1 w-1 rounded-full bg-slate-400"></span>
+<span class="text-primary font-bold flex items-center gap-1">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+</span>
+                        Active Context
+                    </span>
+</div>
+</div>
+<button class="text-slate-400 hover:text-slate-800 transition-colors p-2 hover:bg-white/40 rounded-full">
+<span class="material-symbols-outlined text-[24px]">close</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar bg-white/10">
+<div class="grid grid-cols-2 gap-4">
+<div class="p-4 bg-white/40 border border-white/60 rounded-2xl shadow-glass-sm flex flex-col gap-1 backdrop-blur-sm transition-transform hover:-translate-y-0.5 duration-300">
+<span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Category</span>
+<span class="text-base text-slate-800 font-bold">Anomaly</span>
+</div>
+<div class="p-4 bg-white/40 border border-white/60 rounded-2xl shadow-glass-sm flex flex-col gap-1 backdrop-blur-sm transition-transform hover:-translate-y-0.5 duration-300">
+<span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Confidence</span>
+<span class="text-base text-primary font-bold">88%</span>
+</div>
+<div class="p-4 bg-white/40 border border-white/60 rounded-2xl shadow-glass-sm flex flex-col gap-1 backdrop-blur-sm transition-transform hover:-translate-y-0.5 duration-300">
+<span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Status</span>
+<div class="flex items-center gap-2">
+<div class="h-2 w-2 rounded-full bg-accent-green shadow-[0_0_8px_rgba(52,211,153,0.6)]"></div>
+<span class="text-base text-slate-700 font-medium">Stable</span>
+</div>
+</div>
+<div class="p-4 bg-white/40 border border-white/60 rounded-2xl shadow-glass-sm flex flex-col gap-1 backdrop-blur-sm transition-transform hover:-translate-y-0.5 duration-300">
+<span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Impact Score</span>
+<span class="text-base text-slate-800 font-bold">4.2 <span class="text-[10px] text-slate-400 font-normal">/ 10</span></span>
+</div>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between px-1">
+<h4 class="text-sm font-semibold text-slate-700">Occurrence Timeline (24h)</h4>
+<span class="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">+12% vs avg</span>
+</div>
+<div class="h-32 w-full bg-white/30 border border-white/50 rounded-2xl p-4 relative overflow-hidden shadow-inner">
+<div class="absolute inset-0 top-10 bg-gradient-to-t from-primary/20 to-transparent"></div>
+<div class="w-full h-full flex items-end gap-[4px] justify-between px-2">
+<div class="flex-1 bg-primary/30 h-[20%] rounded-t-sm hover:bg-primary/50 transition-colors"></div>
+<div class="flex-1 bg-primary/30 h-[30%] rounded-t-sm hover:bg-primary/50 transition-colors"></div>
+<div class="flex-1 bg-primary/30 h-[25%] rounded-t-sm hover:bg-primary/50 transition-colors"></div>
+<div class="flex-1 bg-primary/40 h-[40%] rounded-t-sm hover:bg-primary/60 transition-colors"></div>
+<div class="flex-1 bg-primary/40 h-[35%] rounded-t-sm hover:bg-primary/60 transition-colors"></div>
+<div class="flex-1 bg-primary/40 h-[45%] rounded-t-sm hover:bg-primary/60 transition-colors"></div>
+<div class="flex-1 bg-primary/50 h-[60%] rounded-t-sm hover:bg-primary/70 transition-colors"></div>
+<div class="flex-1 bg-primary/50 h-[50%] rounded-t-sm hover:bg-primary/70 transition-colors"></div>
+<div class="flex-1 bg-primary/50 h-[70%] rounded-t-sm hover:bg-primary/70 transition-colors"></div>
+<div class="flex-1 bg-primary/60 h-[65%] rounded-t-sm hover:bg-primary/80 transition-colors"></div>
+<div class="flex-1 bg-primary/60 h-[80%] rounded-t-sm hover:bg-primary/80 transition-colors"></div>
+<div class="flex-1 bg-primary/60 h-[75%] rounded-t-sm hover:bg-primary/80 transition-colors"></div>
+<div class="flex-1 bg-primary/70 h-[85%] rounded-t-sm hover:bg-primary/90 transition-colors"></div>
+<div class="flex-1 bg-primary/70 h-[90%] rounded-t-sm hover:bg-primary/90 transition-colors"></div>
+<div class="flex-1 bg-primary/70 h-[60%] rounded-t-sm hover:bg-primary/90 transition-colors"></div>
+<div class="flex-1 bg-primary/60 h-[50%] rounded-t-sm hover:bg-primary/80 transition-colors"></div>
+<div class="flex-1 bg-primary/60 h-[55%] rounded-t-sm hover:bg-primary/80 transition-colors"></div>
+<div class="flex-1 bg-primary/50 h-[40%] rounded-t-sm hover:bg-primary/70 transition-colors"></div>
+<div class="flex-1 bg-primary/50 h-[30%] rounded-t-sm hover:bg-primary/70 transition-colors"></div>
+<div class="flex-1 bg-primary/40 h-[35%] rounded-t-sm hover:bg-primary/60 transition-colors"></div>
+<div class="flex-1 bg-primary/40 h-[20%] rounded-t-sm hover:bg-primary/60 transition-colors"></div>
+<div class="flex-1 bg-primary/30 h-[25%] rounded-t-sm hover:bg-primary/50 transition-colors"></div>
+<div class="flex-1 bg-primary/30 h-[15%] rounded-t-sm hover:bg-primary/50 transition-colors"></div>
+<div class="flex-1 bg-primary/30 h-[30%] rounded-t-sm hover:bg-primary/50 transition-colors"></div>
+<div class="flex-1 bg-primary/40 h-[40%] rounded-t-sm hover:bg-primary/60 transition-colors"></div>
+<div class="flex-1 bg-primary/40 h-[55%] rounded-t-sm hover:bg-primary/60 transition-colors"></div>
+<div class="flex-1 bg-primary/50 h-[65%] rounded-t-sm hover:bg-primary/70 transition-colors"></div>
+<div class="flex-1 bg-primary/60 h-[70%] rounded-t-sm hover:bg-primary/80 transition-colors"></div>
+<div class="flex-1 bg-primary/70 h-[85%] rounded-t-sm hover:bg-primary/90 transition-colors"></div>
+<div class="flex-1 bg-primary/80 h-[95%] rounded-t-sm hover:bg-primary transition-colors"></div>
+<div class="flex-1 bg-primary/90 h-[80%] rounded-t-sm hover:bg-primary transition-colors"></div>
+<div class="flex-1 bg-primary h-[100%] rounded-t-sm shadow-[0_0_12px_rgba(139,92,246,0.6)]"></div>
+</div>
+</div>
+</div>
+<div class="space-y-3">
+<div class="flex items-center justify-between px-1">
+<h4 class="text-sm font-semibold text-slate-700">Related Signals</h4>
+<button class="text-[10px] font-bold text-primary hover:text-primary-hover bg-primary/5 px-2 py-1 rounded-full hover:bg-primary/10 transition-colors">View All</button>
+</div>
+<div class="space-y-2">
+<div class="flex items-center justify-between p-3 bg-white/40 border border-white/50 hover:bg-white/70 rounded-xl transition-all cursor-pointer group shadow-sm">
+<div class="flex flex-col">
+<span class="text-xs text-slate-700 font-mono font-medium group-hover:text-primary transition-colors">SIG-Alpha-492</span>
+<span class="text-[10px] text-slate-500">Source: External Node 4</span>
+</div>
+<span class="text-[10px] font-mono font-bold text-accent-amber bg-amber-50 px-2 py-0.5 rounded-full border border-amber-100">92%</span>
+</div>
+<div class="flex items-center justify-between p-3 bg-white/40 border border-white/50 hover:bg-white/70 rounded-xl transition-all cursor-pointer group shadow-sm">
+<div class="flex flex-col">
+<span class="text-xs text-slate-700 font-mono font-medium group-hover:text-primary transition-colors">SIG-Beta-102</span>
+<span class="text-[10px] text-slate-500">Source: Internal Mesh</span>
+</div>
+<span class="text-[10px] font-mono font-bold text-accent-green bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">45%</span>
+</div>
+<div class="flex items-center justify-between p-3 bg-white/40 border border-white/50 hover:bg-white/70 rounded-xl transition-all cursor-pointer group shadow-sm">
+<div class="flex flex-col">
+<span class="text-xs text-slate-700 font-mono font-medium group-hover:text-primary transition-colors">SIG-Gamma-883</span>
+<span class="text-[10px] text-slate-500">Source: Deep Archive</span>
+</div>
+<span class="text-[10px] font-mono font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">12%</span>
+</div>
+</div>
+</div>
+<div class="border-t border-white/40 pt-6 space-y-4">
+<h4 class="text-sm font-semibold text-slate-700 px-1">Metadata</h4>
+<div class="grid grid-cols-2 gap-y-4 gap-x-4 text-[11px] bg-white/20 p-4 rounded-xl border border-white/30">
+<div class="text-slate-500 font-medium">First Observed</div>
+<div class="text-slate-700 text-right font-mono">2023-01-12</div>
+<div class="h-px bg-white/40 col-span-2"></div>
+<div class="text-slate-500 font-medium">Ingestion Node</div>
+<div class="text-slate-700 text-right">US-East-4</div>
+<div class="h-px bg-white/40 col-span-2"></div>
+<div class="text-slate-500 font-medium">Schema Version</div>
+<div class="text-slate-700 text-right">v4.2.0</div>
+<div class="h-px bg-white/40 col-span-2"></div>
+<div class="text-slate-500 font-medium">Encryption</div>
+<div class="text-slate-700 text-right">AES-256</div>
+</div>
+</div>
+</div>
+<div class="p-6 border-t border-white/40 bg-white/40 backdrop-blur-xl mt-auto shrink-0 space-y-3 z-30 relative">
+<div class="relative group w-full">
+<button class="w-full flex items-center justify-center gap-2 bg-slate-100 text-slate-400 font-semibold py-2.5 px-4 rounded-xl border border-slate-200 cursor-not-allowed transition-colors shadow-inner" disabled="">
+<span class="material-symbols-outlined text-[18px]">gavel</span>
+                    Promote to Axis
+                </button>
+<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-3 py-1.5 bg-slate-800 text-white text-[10px] rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                    Governance action — irreversible.
+                    <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-800"></div>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="flex-1 flex items-center justify-center gap-2 bg-white/80 hover:bg-white text-slate-600 font-medium py-2.5 px-4 rounded-xl border border-white shadow-sm hover:shadow-md transition-all text-xs">
+<span class="material-symbols-outlined text-[16px]">share</span>
+                    Share
+                </button>
+<button class="flex-1 flex items-center justify-center gap-2 bg-white/80 hover:bg-white text-slate-600 font-medium py-2.5 px-4 rounded-xl border border-white shadow-sm hover:shadow-md transition-all text-xs">
+<span class="material-symbols-outlined text-[16px]">bug_report</span>
+                    Report
+                </button>
+</div>
+</div>
+</aside>
+</div>
+
+</body></html>

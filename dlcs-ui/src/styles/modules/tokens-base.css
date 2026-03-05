@@ -1,0 +1,64 @@
+:root {
+  --dl-bg-base: #e6ecf9;
+  --bg: #e9edf8;
+  --panel: rgba(255, 255, 255, 0.6);
+  --panel-strong: #ffffff;
+  --line: #d6dcef;
+  --line-strong: #c0cbe7;
+  --text: #111a2f;
+  --muted: #5f6b7d;
+  --accent: #1e3a8a;
+  --accent-soft: #d8e0ff;
+  --accent-grad: linear-gradient(135deg, #1e3a8a 0%, #4f46e5 100%);
+  --ok: #16a34a;
+  --warn: #b7791f;
+  --bad: #be123c;
+  --radius: 24px;
+  --shadow: 0 16px 36px rgba(15, 23, 42, 0.16);
+  --shadow-hover: 0 24px 52px rgba(15, 23, 42, 0.22);
+}
+
+* { box-sizing: border-box; }
+html {
+  margin: 0;
+  height: 100%;
+  min-height: 100%;
+  background: var(--bg);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: none;
+}
+#root {
+  width: 100%;
+  min-height: 100%;
+  background: var(--bg);
+  overflow-x: hidden;
+  overflow-y: visible;
+  overscroll-behavior: none;
+}
+body {
+  margin: 0;
+  min-height: 100%;
+  font-family: "Inter", "Noto Sans TC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+h1, h2, h3, h4, p { margin: 0; }
+button, input, select, textarea { font: inherit; }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible {
+  outline: 2px solid #7da7ff;
+  outline-offset: 2px;
+}
+
+@keyframes rise-fade {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.shell {
+  min-height: 100dvh;
+  display: block;
+}

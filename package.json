@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "audit:ui:gate": "node scripts/audit_ui_gate.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2"
+  }
+}

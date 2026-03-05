@@ -1,0 +1,12 @@
+import { chromium } from 'playwright';
+const browser = await chromium.launch({ headless: true });
+const page = await browser.newPage({ viewport: { width: 1600, height: 1000 } });
+await page.goto('http://127.0.0.1:5173/insights', { waitUntil: 'networkidle', timeout: 60000 });
+await page.waitForTimeout(5000);
+const frames = page.locator('iframe');
+const count = await frames.count();
+console.log('iframes', count);
+const target = frames.nth(2);
+await target.screenshot({ path: '/tmp/dlens-insights-iframe.png' });
+console.log('/tmp/dlens-insights-iframe.png');
+await browser.close();

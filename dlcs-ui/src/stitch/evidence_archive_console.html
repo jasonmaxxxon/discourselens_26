@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Glass Evidence Archive</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "glass-surface": "rgba(255, 255, 255, 0.65)",
+                        "glass-border": "rgba(255, 255, 255, 0.8)",
+                        "glass-highlight": "rgba(255, 255, 255, 0.4)",
+                        "primary": "#6366f1", 
+                        "primary-dark": "#4f46e5",
+                        "text-main": "#1e293b",
+                        "text-muted": "#64748b",
+                        "status-green": "#10b981",
+                        "status-amber": "#f59e0b", 
+                        "status-red": "#ef4444",
+                        "status-cyan": "#06b6d4",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"],
+                    },
+                    boxShadow: {
+                        'glass': '0 4px 30px rgba(0, 0, 0, 0.05)',
+                        'glass-hover': '0 10px 40px rgba(0, 0, 0, 0.08)',
+                        'glass-active': '0 0 0 1px rgba(99, 102, 241, 0.5), 0 10px 40px rgba(99, 102, 241, 0.1)',
+                    }
+                },
+            },
+        }
+    </script>
+<style>::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(100, 116, 139, 0.2);
+            border-radius: 999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(100, 116, 139, 0.4);
+        }
+        body {
+            background: radial-gradient(circle at 0% 0%, #e0f2fe 0%, #f0f9ff 50%, #f8fafc 100%);
+            background-attachment: fixed;
+        }.bg-blob-1 {
+            position: absolute;
+            top: -10%;
+            left: -10%;
+            width: 50vw;
+            height: 50vw;
+            background: radial-gradient(circle, rgba(199, 210, 254, 0.4) 0%, rgba(255, 255, 255, 0) 70%);
+            border-radius: 50%;
+            filter: blur(60px);
+            z-index: -1;
+            pointer-events: none;
+        }
+        .bg-blob-2 {
+            position: absolute;
+            bottom: -10%;
+            right: -10%;
+            width: 60vw;
+            height: 60vw;
+            background: radial-gradient(circle, rgba(221, 214, 254, 0.4) 0%, rgba(255, 255, 255, 0) 70%);
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="text-text-main font-display antialiased h-screen flex flex-col overflow-hidden selection:bg-primary/20 selection:text-primary-dark relative">
+<div class="bg-blob-1"></div>
+<div class="bg-blob-2"></div>
+<header class="h-16 flex items-center justify-between px-8 z-20 shrink-0">
+<div class="bg-glass-surface/80 backdrop-blur-md border border-white/60 rounded-full pl-2 pr-6 py-2 shadow-glass flex items-center gap-3">
+<div class="size-8 bg-white rounded-full text-primary flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[20px]">grid_view</span>
+</div>
+<h1 class="text-text-main text-sm font-bold tracking-wide uppercase">Evidence Archive <span class="text-text-muted font-normal opacity-70 ml-2">v4.2.0</span></h1>
+</div>
+<div class="bg-glass-surface/80 backdrop-blur-md border border-white/60 rounded-full px-2 py-1.5 shadow-glass flex gap-1">
+<button class="flex items-center justify-center size-8 rounded-full hover:bg-white text-text-muted hover:text-primary transition-all">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+</button>
+<button class="flex items-center justify-center size-8 rounded-full hover:bg-white text-text-muted hover:text-primary transition-all relative">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+<span class="absolute top-1.5 right-1.5 size-2 bg-primary rounded-full border border-white shadow-sm"></span>
+</button>
+<button class="flex items-center justify-center size-8 rounded-full hover:bg-white text-text-muted hover:text-primary transition-all">
+<span class="material-symbols-outlined text-[20px]">help</span>
+</button>
+<div class="w-px h-4 bg-gray-300 mx-1 my-auto"></div>
+<div class="flex items-center gap-2 px-1">
+<div class="size-7 rounded-full bg-gradient-to-br from-primary to-indigo-600 text-white flex items-center justify-center text-xs font-mono font-bold shadow-sm">OA</div>
+</div>
+</div>
+</header>
+<div class="px-8 pb-4 shrink-0 z-10 flex gap-4">
+<div class="bg-glass-surface/60 backdrop-blur-md border border-white/50 rounded-2xl p-2 flex items-center justify-between w-full shadow-glass">
+<div class="flex items-center gap-3 flex-1 overflow-x-auto no-scrollbar pl-2">
+<div class="relative group">
+<select class="appearance-none bg-white/50 border border-white/60 text-xs font-medium text-text-main py-2 pl-3 pr-8 rounded-xl hover:bg-white focus:border-primary/50 focus:ring-0 cursor-pointer transition-all shadow-sm">
+<option>Phenomenon: All</option>
+<option>Disinformation</option>
+<option>CIB</option>
+<option>Hate Speech</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-text-muted">
+<span class="material-symbols-outlined text-[16px]">expand_more</span>
+</div>
+</div>
+<div class="relative group">
+<select class="appearance-none bg-white/50 border border-white/60 text-xs font-medium text-text-main py-2 pl-3 pr-8 rounded-xl hover:bg-white focus:border-primary/50 focus:ring-0 cursor-pointer transition-all shadow-sm">
+<option>Risk: High</option>
+<option>Risk: Moderate</option>
+<option>Risk: Low</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-text-muted">
+<span class="material-symbols-outlined text-[16px]">expand_more</span>
+</div>
+</div>
+<div class="relative group">
+<select class="appearance-none bg-white/50 border border-white/60 text-xs font-medium text-text-main py-2 pl-3 pr-8 rounded-xl hover:bg-white focus:border-primary/50 focus:ring-0 cursor-pointer transition-all shadow-sm">
+<option>Stability: All</option>
+<option>Volatile</option>
+<option>Stable</option>
+<option>Decaying</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-text-muted">
+<span class="material-symbols-outlined text-[16px]">expand_more</span>
+</div>
+</div>
+<div class="h-6 w-px bg-gray-300/50 mx-2"></div>
+<div class="relative flex items-center w-64 group">
+<span class="absolute left-3 text-text-muted material-symbols-outlined text-[18px] group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full bg-white/50 border border-white/60 rounded-xl py-2 pl-10 pr-3 text-xs text-text-main placeholder-text-muted focus:bg-white focus:border-primary/50 focus:ring-2 focus:ring-primary/10 hover:bg-white transition-all shadow-sm" placeholder="Search hash, keyword, or ID..." type="text"/>
+</div>
+</div>
+<div class="text-xs text-text-muted font-mono shrink-0 px-4">
+                Indexed: <span class="text-text-main font-semibold bg-white/50 px-2 py-1 rounded-lg border border-white/50">1,248</span>
+</div>
+</div>
+</div>
+<div class="flex flex-1 overflow-hidden px-8 pb-6 gap-6">
+<main class="flex-1 overflow-y-auto pr-2">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-5">
+<article class="group relative flex flex-col bg-glass-surface backdrop-blur-sm border border-white/60 rounded-3xl hover:shadow-glass-hover hover:-translate-y-1 transition-all duration-300 cursor-pointer overflow-hidden shadow-glass">
+<div class="absolute top-4 right-4 size-2 rounded-full bg-status-cyan shadow-[0_0_10px_rgba(6,182,212,0.6)] animate-pulse"></div>
+<div class="p-5 flex flex-col h-full relative z-10">
+<div class="flex justify-between items-center mb-3">
+<span class="font-mono text-[10px] text-text-muted tracking-wide bg-white/60 px-2 py-1 rounded-lg">#POST-8821</span>
+<div class="size-6 rounded-full bg-white/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-[14px] text-text-main">arrow_outward</span>
+</div>
+</div>
+<h3 class="text-sm font-bold text-text-main mb-1 leading-tight">Inorganic-Growth</h3>
+<p class="text-xs text-text-muted line-clamp-2 mb-4 font-medium leading-relaxed">Detected anomalous spike in engagement metrics originating from IP cluster 192.168.x.x.</p>
+<div class="h-28 w-full bg-white/30 rounded-2xl border border-white/50 mb-4 overflow-hidden relative shadow-inner">
+<img alt="Data visualization graph showing a sharp upward trend" class="w-full h-full object-cover opacity-80 mix-blend-multiply" data-alt="Abstract data visualization with cyan lines on dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBk2aLD9G6xjOoOoGXaqqjVpBuWFsu5MycHIlLk1kSO2ux9A5TSY28IU9sO-H553fpnxYjoyzX0BCC9yc1hv2E7K8-L1oSUilqdmBRf-XuL71V8GXJ3VRzAX8R0T3F9LynHBAnpcCf30mt_bl750Yu6utMY3tKRY71fGkPkpV_cii5n4CsVaIHYIZj7nF7YibfTB4CerWJutF6ML9WgBThyV5tyVo2ObLFpB_ZiDcUCoyyvoa6nxqwxLYOPcLZZtZyxqpfmYRWTczw"/>
+<div class="absolute bottom-2 right-2 px-2 py-0.5 bg-white/80 rounded-lg text-[9px] font-mono text-text-main backdrop-blur-md shadow-sm border border-white">IMG</div>
+</div>
+<div class="mt-auto flex items-center justify-between pt-3 border-t border-gray-200/30">
+<div class="flex items-center gap-2">
+<span class="px-2 py-1 rounded-lg bg-status-cyan/10 text-status-cyan text-[10px] font-bold border border-status-cyan/20">High</span>
+<span class="text-[10px] text-text-muted font-medium">Reliability</span>
+</div>
+<span class="text-[10px] font-mono text-text-main font-bold bg-white/50 px-2 py-1 rounded-lg">14.2k <span class="text-text-muted font-normal">Eng</span></span>
+</div>
+</div>
+</article>
+<article class="group relative flex flex-col bg-white/80 backdrop-blur-md border border-primary/40 rounded-3xl shadow-glass-active ring-2 ring-primary/10 cursor-pointer overflow-hidden transform scale-[1.02] transition-all">
+<div class="absolute top-4 right-4 size-2 rounded-full bg-status-red shadow-[0_0_12px_rgba(239,68,68,0.8)]"></div>
+<div class="p-5 flex flex-col h-full relative z-10">
+<div class="flex justify-between items-center mb-3">
+<span class="font-mono text-[10px] text-primary font-bold tracking-wide bg-primary/5 px-2 py-1 rounded-lg border border-primary/10">#POST-9024</span>
+<div class="size-6 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+</div>
+</div>
+<h3 class="text-sm font-bold text-text-main mb-1 leading-tight">Coordinated-Attack</h3>
+<p class="text-xs text-text-muted line-clamp-2 mb-4 font-medium leading-relaxed">Cross-platform signal correlation identified across 4 major social networks targeting entity.</p>
+<div class="h-28 w-full bg-white/30 rounded-2xl border border-white/50 mb-4 overflow-hidden relative shadow-inner">
+<img alt="Abstract network diagram showing nodes connecting" class="w-full h-full object-cover opacity-80 mix-blend-multiply" data-alt="Red abstract network nodes on dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaFBpT8JRXj9TD9HWWUlIFScbW7iKdcVvje-NRJx2aoj94yW0PfNY3aWOQZE9dq9ElP5cyQyuCYypyDH40yXp8FRpdLvxpbx0_CEe_ocmIES8-u1ulkGzQ5N2yMQCzo0Ffo9d1oiiPGaKQ9JxKo4o5cu-06p02-j0CvXCDy_VMUhv6owIHqORdmVOPBdJoqPEMHMhPcJ8N29HgnlBnCxwLLymAl8qb1IblNv36xx-b7aRqQTjdO9UEfTXHBTnK0JcYmp8Y1IyTJQ8"/>
+<div class="absolute bottom-2 right-2 px-2 py-0.5 bg-white/80 rounded-lg text-[9px] font-mono text-text-main backdrop-blur-md shadow-sm border border-white">TXT</div>
+</div>
+<div class="mt-auto flex items-center justify-between pt-3 border-t border-gray-200/30">
+<div class="flex items-center gap-2">
+<span class="px-2 py-1 rounded-lg bg-status-red/10 text-status-red text-[10px] font-bold border border-status-red/20">Critical</span>
+<span class="text-[10px] text-text-muted font-medium">Reliability</span>
+</div>
+<span class="text-[10px] font-mono text-text-main font-bold bg-white/50 px-2 py-1 rounded-lg">89.1k <span class="text-text-muted font-normal">Eng</span></span>
+</div>
+</div>
+</article>
+<article class="group relative flex flex-col bg-glass-surface backdrop-blur-sm border border-white/60 rounded-3xl hover:shadow-glass-hover hover:-translate-y-1 transition-all duration-300 cursor-pointer overflow-hidden shadow-glass">
+<div class="absolute top-4 right-4 size-2 rounded-full bg-status-amber shadow-[0_0_10px_rgba(245,158,11,0.5)]"></div>
+<div class="p-5 flex flex-col h-full relative z-10">
+<div class="flex justify-between items-center mb-3">
+<span class="font-mono text-[10px] text-text-muted tracking-wide bg-white/60 px-2 py-1 rounded-lg">#POST-7712</span>
+</div>
+<h3 class="text-sm font-bold text-text-main mb-1 leading-tight">Sentiment-Shift</h3>
+<p class="text-xs text-text-muted line-clamp-2 mb-4 font-medium leading-relaxed">Sudden drop in positive sentiment keywords within geographic region US-EAST-1.</p>
+<div class="h-28 w-full bg-white/30 rounded-2xl border border-white/50 mb-4 flex items-center justify-center text-text-muted/40 shadow-inner">
+<span class="material-symbols-outlined text-4xl">bar_chart</span>
+</div>
+<div class="mt-auto flex items-center justify-between pt-3 border-t border-gray-200/30">
+<div class="flex items-center gap-2">
+<span class="px-2 py-1 rounded-lg bg-status-amber/10 text-status-amber text-[10px] font-bold border border-status-amber/20">Med</span>
+<span class="text-[10px] text-text-muted font-medium">Reliability</span>
+</div>
+<span class="text-[10px] font-mono text-text-main font-bold bg-white/50 px-2 py-1 rounded-lg">2.4k <span class="text-text-muted font-normal">Eng</span></span>
+</div>
+</div>
+</article>
+<article class="group relative flex flex-col bg-glass-surface backdrop-blur-sm border border-white/60 rounded-3xl hover:shadow-glass-hover hover:-translate-y-1 transition-all duration-300 cursor-pointer overflow-hidden shadow-glass">
+<div class="absolute top-4 right-4 size-2 rounded-full bg-status-green shadow-[0_0_10px_rgba(34,197,94,0.5)]"></div>
+<div class="p-5 flex flex-col h-full relative z-10">
+<div class="flex justify-between items-center mb-3">
+<span class="font-mono text-[10px] text-text-muted tracking-wide bg-white/60 px-2 py-1 rounded-lg">#POST-6543</span>
+</div>
+<h3 class="text-sm font-bold text-text-main mb-1 leading-tight">Bot-Network-C</h3>
+<p class="text-xs text-text-muted line-clamp-2 mb-4 font-medium leading-relaxed">Inactive dormant accounts reactivated simultaneously.</p>
+<div class="h-28 w-full bg-white/30 rounded-2xl border border-white/50 mb-4 overflow-hidden relative shadow-inner">
+<img alt="Abstract digital matrix code rain" class="w-full h-full object-cover opacity-80 mix-blend-multiply" data-alt="Green matrix rain code on dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsbl8jj6todbDCdPn8IaCC97BfvuhWmzSJU1FQEINr7NFc8DRcT9m25HsMG4Py9UN7IooLkiXgepDj7lx4ULkisYrdofG1y3DGNSgtd92ZnikJkXfsa_tDCuM5aj91CRG-o3Ju5tekHz9ALmIAmO07FE1TBcIq2msBBr2Mnc87efZ36x9AfmgLHiIFSYZGG8B-i4ZIg15qYkVh6vJYdk4IBggddePiIrN0rYPlWXldHrJe2bLTpr1k8DnCJfLxzUZTsWjFK72X9fM"/>
+<div class="absolute bottom-2 right-2 px-2 py-0.5 bg-white/80 rounded-lg text-[9px] font-mono text-text-main backdrop-blur-md shadow-sm border border-white">LOG</div>
+</div>
+<div class="mt-auto flex items-center justify-between pt-3 border-t border-gray-200/30">
+<div class="flex items-center gap-2">
+<span class="px-2 py-1 rounded-lg bg-status-green/10 text-status-green text-[10px] font-bold border border-status-green/20">Low</span>
+<span class="text-[10px] text-text-muted font-medium">Reliability</span>
+</div>
+<span class="text-[10px] font-mono text-text-main font-bold bg-white/50 px-2 py-1 rounded-lg">500 <span class="text-text-muted font-normal">Eng</span></span>
+</div>
+</div>
+</article>
+<article class="group relative flex flex-col bg-glass-surface backdrop-blur-sm border border-white/60 rounded-3xl hover:shadow-glass-hover hover:-translate-y-1 transition-all duration-300 cursor-pointer overflow-hidden shadow-glass">
+<div class="absolute top-4 right-4 size-2 rounded-full bg-status-cyan shadow-[0_0_10px_rgba(6,182,212,0.5)]"></div>
+<div class="p-5 flex flex-col h-full relative z-10">
+<div class="flex justify-between items-center mb-3">
+<span class="font-mono text-[10px] text-text-muted tracking-wide bg-white/60 px-2 py-1 rounded-lg">#POST-8822</span>
+</div>
+<h3 class="text-sm font-bold text-text-main mb-1 leading-tight">Keyword-Flood</h3>
+<p class="text-xs text-text-muted line-clamp-2 mb-4 font-medium leading-relaxed">Volume anomaly detected for keyword "Project Omega".</p>
+<div class="h-28 w-full bg-white/30 rounded-2xl border border-white/50 mb-4 flex items-center justify-center text-text-muted/40 shadow-inner">
+<span class="material-symbols-outlined text-4xl">waves</span>
+</div>
+<div class="mt-auto flex items-center justify-between pt-3 border-t border-gray-200/30">
+<div class="flex items-center gap-2">
+<span class="px-2 py-1 rounded-lg bg-status-cyan/10 text-status-cyan text-[10px] font-bold border border-status-cyan/20">High</span>
+<span class="text-[10px] text-text-muted font-medium">Reliability</span>
+</div>
+<span class="text-[10px] font-mono text-text-main font-bold bg-white/50 px-2 py-1 rounded-lg">32.1k <span class="text-text-muted font-normal">Eng</span></span>
+</div>
+</div>
+</article>
+<article class="group relative flex flex-col bg-glass-surface backdrop-blur-sm border border-white/60 rounded-3xl hover:shadow-glass-hover hover:-translate-y-1 transition-all duration-300 cursor-pointer overflow-hidden shadow-glass">
+<div class="absolute top-4 right-4 size-2 rounded-full bg-status-red shadow-[0_0_10px_rgba(239,68,68,0.5)]"></div>
+<div class="p-5 flex flex-col h-full relative z-10">
+<div class="flex justify-between items-center mb-3">
+<span class="font-mono text-[10px] text-text-muted tracking-wide bg-white/60 px-2 py-1 rounded-lg">#POST-9901</span>
+</div>
+<h3 class="text-sm font-bold text-text-main mb-1 leading-tight">Deepfake-Audio</h3>
+<p class="text-xs text-text-muted line-clamp-2 mb-4 font-medium leading-relaxed">Synthetic media fingerprint match &gt; 99% on distributed audio file.</p>
+<div class="h-28 w-full bg-white/30 rounded-2xl border border-white/50 mb-4 overflow-hidden relative shadow-inner">
+<img alt="Visual representation of sound waves" class="w-full h-full object-cover opacity-80 mix-blend-multiply" data-alt="Red sound wave visualization on dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBG7ptkpwL96T4kOso_ZQ6tBztEoUJD2FMNGLOu1fofqMpZ3mWxdGsIoAXUez3okWrXJoR3eCu1F7r3n9kd6-IHhRkRXDQ_a57l0SveDdqZP2IHRVTpkiURNiyv5InPzIhobSGIVLeHYopChT-uic4RK3fHLSMLNHfHYXXbwKe2jOQL_1qBcM_wf3GCGs-a8zo2jXNLwm_AOhUDztKgEZsdsHWrd3PtNRp5-scE7mUU0OolHz7o8uZ2jqIV31wWGUfLd6hxxQvuTCk"/>
+<div class="absolute bottom-2 right-2 px-2 py-0.5 bg-white/80 rounded-lg text-[9px] font-mono text-text-main backdrop-blur-md shadow-sm border border-white">AUD</div>
+</div>
+<div class="mt-auto flex items-center justify-between pt-3 border-t border-gray-200/30">
+<div class="flex items-center gap-2">
+<span class="px-2 py-1 rounded-lg bg-status-red/10 text-status-red text-[10px] font-bold border border-status-red/20">Critical</span>
+<span class="text-[10px] text-text-muted font-medium">Reliability</span>
+</div>
+<span class="text-[10px] font-mono text-text-main font-bold bg-white/50 px-2 py-1 rounded-lg">105k <span class="text-text-muted font-normal">Eng</span></span>
+</div>
+</div>
+</article>
+</div>
+<div class="mt-8 flex justify-center pb-8">
+<button class="px-6 py-2.5 rounded-full bg-white/40 border border-white/60 text-xs font-bold text-text-muted hover:text-primary hover:bg-white shadow-sm backdrop-blur-md flex items-center gap-2 transition-all">
+<span class="material-symbols-outlined text-[16px]">refresh</span> Load More Evidence
+                </button>
+</div>
+</main>
+<aside class="w-[380px] bg-glass-surface/80 backdrop-blur-xl border border-white/50 rounded-3xl flex flex-col shrink-0 shadow-glass overflow-hidden my-1">
+<div class="h-14 flex items-center justify-between px-6 border-b border-white/40 shrink-0 bg-white/20">
+<h2 class="text-xs font-bold uppercase tracking-wider text-text-muted flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-primary">policy</span> Forensic Inspector
+                </h2>
+<div class="flex gap-2">
+<button class="text-text-muted hover:text-text-main p-1.5 rounded-lg hover:bg-white/50 transition-colors">
+<span class="material-symbols-outlined text-[18px]">open_in_full</span>
+</button>
+<button class="text-text-muted hover:text-text-main p-1.5 rounded-lg hover:bg-white/50 transition-colors">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-6 space-y-6">
+<div class="bg-white/40 rounded-2xl p-4 border border-white/60 shadow-sm">
+<div class="flex items-center justify-between mb-3">
+<span class="inline-flex items-center rounded-lg bg-red-100/50 px-2.5 py-1 text-xs font-bold text-status-red ring-1 ring-inset ring-red-500/10">Critical Risk</span>
+<span class="font-mono text-[10px] text-text-muted">ID: 8a7f-2b9c</span>
+</div>
+<h3 class="text-xl font-bold text-text-main mb-1">Coordinated-Attack</h3>
+<p class="text-xs text-text-muted font-medium">Inspector Context: #POST-9024</p>
+</div>
+<div class="grid grid-cols-2 gap-x-3 gap-y-3">
+<div class="space-y-1">
+<label class="text-[10px] uppercase tracking-wider text-text-muted font-bold pl-1">Timestamp</label>
+<div class="font-mono text-[11px] text-text-main bg-white/60 px-3 py-2 rounded-xl border border-white/50 truncate shadow-sm">
+                            2023-10-27T14:22:01Z
+                        </div>
+</div>
+<div class="space-y-1">
+<label class="text-[10px] uppercase tracking-wider text-text-muted font-bold pl-1">Payload Size</label>
+<div class="font-mono text-[11px] text-text-main bg-white/60 px-3 py-2 rounded-xl border border-white/50 shadow-sm">
+                            4.2 MB
+                        </div>
+</div>
+<div class="space-y-1">
+<label class="text-[10px] uppercase tracking-wider text-text-muted font-bold pl-1">Entity Count</label>
+<div class="font-mono text-[11px] text-text-main bg-white/60 px-3 py-2 rounded-xl border border-white/50 shadow-sm">
+                            12 Unique
+                        </div>
+</div>
+<div class="space-y-1">
+<label class="text-[10px] uppercase tracking-wider text-text-muted font-bold pl-1">Hash Status</label>
+<div class="flex items-center gap-1.5 font-mono text-[11px] text-emerald-700 font-medium bg-emerald-50/80 px-3 py-2 rounded-xl border border-emerald-100 shadow-sm">
+<span class="material-symbols-outlined text-[14px]">verified</span> Verified
+                        </div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex items-center justify-between pl-1">
+<label class="text-[10px] uppercase tracking-wider text-text-muted font-bold">Extracted OCR Fragment</label>
+<span class="text-[10px] text-primary font-bold bg-primary/5 px-2 py-0.5 rounded-md">98.2% Confidence</span>
+</div>
+<div class="bg-gray-50/80 border border-white/60 rounded-xl p-4 relative group shadow-inner">
+<pre class="font-mono text-[11px] text-slate-600 whitespace-pre-wrap leading-relaxed">&gt;&gt; INITIATE_PROTOCOL_OMEGA
+&gt;&gt; TARGET_ID: [REDACTED]
+&gt;&gt; SYNC_NODES: 442
+&gt;&gt; STATUS: ACTIVE_PUSH
+...fragment data ends...</pre>
+<button class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 bg-white rounded-lg text-text-muted hover:text-primary shadow-sm border border-gray-200">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+</button>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-[10px] uppercase tracking-wider text-text-muted font-bold pl-1">Top Linked Entities</label>
+<div class="flex flex-wrap gap-2">
+<span class="inline-flex items-center rounded-full bg-white/60 border border-white/80 px-3 py-1 text-xs font-medium text-text-muted hover:bg-white hover:text-primary hover:border-primary/30 transition-all cursor-pointer shadow-sm">@nexus_core</span>
+<span class="inline-flex items-center rounded-full bg-white/60 border border-white/80 px-3 py-1 text-xs font-medium text-text-muted hover:bg-white hover:text-primary hover:border-primary/30 transition-all cursor-pointer shadow-sm">#omega_protocol</span>
+<span class="inline-flex items-center rounded-full bg-white/60 border border-white/80 px-3 py-1 text-xs font-medium text-text-muted hover:bg-white hover:text-primary hover:border-primary/30 transition-all cursor-pointer shadow-sm">192.168.1.1</span>
+</div>
+</div>
+</div>
+<div class="p-6 border-t border-white/40 bg-white/30 shrink-0 backdrop-blur-lg">
+<button class="w-full bg-gradient-to-r from-primary to-indigo-600 hover:to-indigo-500 text-white font-semibold text-xs py-3.5 rounded-xl shadow-lg shadow-primary/30 transition-all flex items-center justify-center gap-2 group ring-1 ring-white/20">
+<span class="material-symbols-outlined text-[18px] group-hover:animate-pulse">rocket_launch</span>
+                    Run Deep Analysis
+                </button>
+<div class="text-[10px] text-center text-text-muted mt-3 font-medium">
+                    Est. processing time: ~45s
+                </div>
+</div>
+</aside>
+</div>
+
+</body></html>

@@ -1,50 +1,88 @@
-import { BrowserRouter, Routes, Route, Navigate, useNavigate, useParams } from "react-router-dom";
-import MainLayout from "./components/MainLayout";
-import LogisticsDashboard from "./pages/LogisticsDashboard";
-import OpsSystemVitals from "./pages/OpsSystemVitals";
-import OpsDashboard from "./pages/OpsDashboard";
-import PipelineAPage from "./pages/PipelineAPage";
-import PipelinePage from "./pages/PipelinePage";
-import HistoryPage from "./pages/HistoryPage";
-import ArchivePage from "./pages/ArchivePage";
-import DemoNarrativePage from "./pages/DemoNarrativePage";
-import AnalysisLoadingScreen from "./pages/AnalysisLoadingScreen";
-import NarrativeDetailPage from "./pages/NarrativeDetailPage";
+import { useEffect, useMemo } from "react";
+import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
+import { MainLayout } from "./components/MainLayout";
+import { OverviewPage } from "./pages/OverviewPage";
+import { PipelinePage } from "./pages/PipelinePage";
+import { InsightsPage } from "./pages/InsightsPage";
+import { LibraryPage } from "./pages/LibraryPage";
+import { ReviewPage } from "./pages/ReviewPage";
+import { StitchOverviewPage } from "./pages/StitchOverviewPage";
+import { StitchPipelinePage } from "./pages/StitchPipelinePage";
+import { StitchInsightsPage } from "./pages/StitchInsightsPage";
+import { StitchLibraryPage } from "./pages/StitchLibraryPage";
+import { StitchReviewPage } from "./pages/StitchReviewPage";
+import { StitchGlobalTopBar } from "./components/StitchGlobalTopBar";
 
-function NarrativeDetailRoute() {
-  const { postId } = useParams();
-  const navigate = useNavigate();
-  if (!postId) return null;
-  return <NarrativeDetailPage postId={postId} navigate={navigate} />;
+const PRIMARY_ORDER = ["/overview", "/pipeline", "/insights", "/library", "/review"];
+
+function canonicalPrimaryPath(pathname: string): string {
+  const clean = pathname.replace(/\/+$/, "");
+  if (clean === "/" || clean === "/dashboard") return "/overview";
+  if (clean === "/insight") return "/insights";
+  return PRIMARY_ORDER.find((route) => clean === route || clean.startsWith(`${route}/`)) || "/overview";
 }
 
-export default function App() {
+function LegacyRoutes() {
   return (
-    <BrowserRouter>
-      <MainLayout>
-        <Routes>
-          {/* Default */}
-          <Route path="/" element={<Navigate to="/ops/vitals" replace />} />
+    <MainLayout>
+      <Routes>
+        <Route path="/legacy" element={<Navigate to="/legacy/overview" replace />} />
+        <Route path="/legacy/overview" element={<OverviewPage />} />
+        <Route path="/legacy/pipeline" element={<PipelinePage />} />
+        <Route path="/legacy/insights" element={<InsightsPage />} />
+        <Route path="/legacy/library" element={<LibraryPage />} />
+        <Route path="/legacy/review" element={<ReviewPage />} />
+        <Route path="*" element={<Navigate to="/legacy/overview" replace />} />
+      </Routes>
+    </MainLayout>
+  );
+}
 
-          {/* New Ops (Query-driven) */}
-          <Route path="/ops/vitals" element={<OpsSystemVitals />} />
-          <Route path="/ops/jobs" element={<LogisticsDashboard />} />
-          <Route path="/ops/dashboard" element={<OpsDashboard />} />
+export function App() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isLegacy = location.pathname.startsWith("/legacy");
+  const activePath = useMemo(() => canonicalPrimaryPath(location.pathname), [location.pathname]);
 
-          {/* Legacy Routes */}
-          <Route path="/pipeline/a" element={<PipelineAPage />} />
-          <Route path="/pipeline/b" element={<PipelinePage variant="B" />} />
-          <Route path="/pipeline/c" element={<PipelinePage variant="C" />} />
-          <Route path="/pipeline/progress/:jobId" element={<AnalysisLoadingScreen />} />
-          <Route path="/history" element={<HistoryPage />} />
-          <Route path="/archive" element={<ArchivePage />} />
-          <Route path="/demo" element={<DemoNarrativePage />} />
-          <Route path="/narrative/:postId" element={<NarrativeDetailRoute />} />
+  useEffect(() => {
+    if (isLegacy) return;
+    const clean = location.pathname.replace(/\/+$/, "");
+    if (clean !== activePath) {
+      navigate(activePath + location.search, { replace: true });
+    }
+  }, [activePath, isLegacy, location.pathname, location.search, navigate]);
 
-          {/* Fallback */}
-          <Route path="*" element={<div className="p-10 text-slate-400">404 Not Found</div>} />
-        </Routes>
-      </MainLayout>
-    </BrowserRouter>
+  if (isLegacy) {
+    return <LegacyRoutes />;
+  }
+
+  const pageMap = {
+    "/overview": <StitchOverviewPage />,
+    "/pipeline": <StitchPipelinePage />,
+    "/insights": <StitchInsightsPage />,
+    "/library": <StitchLibraryPage />,
+    "/review": <StitchReviewPage />,
+  } as const;
+  const activePage = pageMap[activePath as keyof typeof pageMap] || pageMap["/overview"];
+
+  return (
+    <div className="stitch-app-shell">
+      <StitchGlobalTopBar />
+      <main className="stitch-shell-main">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.section
+            key={activePath}
+            className="stitch-page active"
+            initial={{ opacity: 0, y: 8, scale: 0.997 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -6, scale: 0.997 }}
+            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {activePage}
+          </motion.section>
+        </AnimatePresence>
+      </main>
+    </div>
   );
 }
