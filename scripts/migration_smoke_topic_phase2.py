@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import sys
 import uuid
+from datetime import datetime, timezone
 from typing import Any, Dict, List
 
 from database.store import supabase
@@ -72,6 +73,16 @@ def _expect_insert_fail(fn, label: str) -> None:
     except Exception:
         return
     raise AssertionError(f"expected constraint failure: {label}")
+
+
+def _canonical_iso_utc(value: Any) -> str:
+    text = str(value or "").strip()
+    if not text:
+        return ""
+    dt = datetime.fromisoformat(text.replace("Z", "+00:00"))
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
 def main() -> None:
@@ -179,8 +190,8 @@ def main() -> None:
         read_post_ids = [int(r["post_id"]) for r in (getattr(read_posts_resp, "data", None) or []) if isinstance(r, dict)]
         recomputed = compute_topic_run_hash(
             seed_query=str(read_run.get("seed_query") or ""),
-            time_range_start=str(read_run.get("time_range_start") or ""),
-            time_range_end=str(read_run.get("time_range_end") or ""),
+            time_range_start=_canonical_iso_utc(read_run.get("time_range_start")),
+            time_range_end=_canonical_iso_utc(read_run.get("time_range_end")),
             post_ids=read_post_ids,
         )
         if recomputed != str(read_run.get("topic_run_hash") or ""):
