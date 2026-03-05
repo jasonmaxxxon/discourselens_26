@@ -12,3 +12,21 @@ logs/
 artifacts/
 reports/
 auth_threads.json
+
+# local runtime / sandbox
+.venv/
+.playwright-cli/
+output/
+
+# local design mockups and generated launch binary
+stitch_d_lens_mockup/
+start-bin
+
+# frontend build/test artifacts
+dlcs-ui/dist/
+dlcs-ui/coverage/
+dlcs-ui/*.tsbuildinfo
+dlcs-ui/vite.config.js
+dlcs-ui/vite.config.d.ts
+dlcs-ui/node_modules_broken_*/
+dlcs-ui/library-after-wire.png

@@ -1,4 +1,5 @@
 import logging
+import os
 import re
 from typing import Any, Dict, List, Optional
 
@@ -462,6 +463,8 @@ def validate_analysis_json(analysis_v4: AnalysisV4) -> tuple[bool, str, list[str
         missing.append("phenomenon.id_or_name")
 
     # evidence count (best-effort: look for evidence.refs if present)
+    # Skip hard requirement when phenomenon enrichment is disabled.
+    phen_enrichment_enabled = str(os.getenv("DL_ENABLE_PHENOMENON_ENRICHMENT", "")).lower() in {"1", "true", "yes", "on"}
     evidence_count = 0
     if hasattr(analysis_v4, "evidence"):
         try:
@@ -470,7 +473,7 @@ def validate_analysis_json(analysis_v4: AnalysisV4) -> tuple[bool, str, list[str
                 evidence_count = len(refs)
         except Exception:
             evidence_count = 0
-    if evidence_count < 2:
+    if phen_enrichment_enabled and evidence_count < 2:
         missing.append("phenomenon.evidence>=2")
 
     # hard_metrics share bounds (if present)

@@ -1,0 +1,23 @@
+flowchart TD
+  A["POST /api/topics/run"] --> B["Validate payload"]
+  B --> C["Canonicalize post_ids + time range"]
+  C --> D["Compute topic_run_hash (Topic Contract V1)"]
+  D --> E{"topic_run_hash exists?"}
+  E -- yes --> F["Return accepted + idempotent_hit"]
+  E -- no --> G["Insert topic_runs"]
+  G --> H["Insert topic_posts"]
+  H --> I["Return accepted + topic_run_hash"]
+
+  J["GET /api/topics/{topic_id}"] --> K["Validate UUID"]
+  K --> L{"topic run found?"}
+  L -- no --> M["404 not_found"]
+  L -- yes --> N["Read topic_posts preview"]
+  N --> O["Return detail payload (meta/lifecycle pending)"]
+
+  P["scripts/migration_smoke_topic_phase2.py"] --> Q["Schema exists check"]
+  Q --> R["CRUD + hash roundtrip"]
+  R --> S["Constraint assertions"]
+
+  T["scripts/verify_topic_api_contract.py"] --> U["POST create + idempotent"]
+  U --> V["GET detail + 400/404 edge cases"]
+  V --> W["Header + never-500 checks"]

@@ -42,6 +42,13 @@ python3 scripts/run_fetcher_and_ingest.py "<threads_url>" --headless
 python3 scripts/run_preanalysis.py --post-id 410 --prefer-sot --persist-assignments
 ```
 
+**Topic Contract / Merge Gates**
+```bash
+PYTHONPATH=. python3 scripts/verify_topic_contract_golden.py
+make topic:migration_smoke
+make topic:api_contract
+```
+
 **Ops UI**
 - Vitals: `http://localhost:5173/ops/vitals`
 - Jobs: `http://localhost:5173/ops/jobs`

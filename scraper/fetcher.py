@@ -388,7 +388,7 @@ def extract_metrics(page) -> dict:
                 return n
         return 0
 
-    metrics = {"likes": 0, "replies": 0, "reposts": 0, "views": 0}
+    metrics = {"likes": 0, "replies": 0, "reposts": 0, "shares": 0, "views": 0}
     article = page.query_selector("article")
     root = article or page
 
@@ -396,6 +396,7 @@ def extract_metrics(page) -> dict:
         "likes": [" like ", " likes "],
         "replies": [" reply ", " replies ", " comment ", " comments "],
         "reposts": [" repost ", " reposts "],
+        "shares": [" share ", " shares ", " send ", " forward "],
         "views": [" view ", " views "],
     }
     for key, phrases in aria_map.items():
@@ -484,6 +485,37 @@ def extract_metrics(page) -> dict:
                 if val:
                     metrics[key] = val
                     break
+
+    # Fallback: reuse structured card metrics (main post card)
+    if not metrics.get("shares") or not metrics.get("reposts"):
+        try:
+            cards = _harvest_cards_structured(page)
+            if cards:
+                url = page.url or ""
+                post_id = _extract_post_id(url) if url else ""
+                best = None
+                if post_id:
+                    for card in cards:
+                        perma = card.get("permalink") or ""
+                        if post_id in perma:
+                            best = card
+                            break
+                if not best:
+                    best = cards[0]
+                card_metrics = best.get("metrics") or {}
+                for key in ("likes", "replies", "reposts", "shares"):
+                    raw = card_metrics.get(key) or {}
+                    if metrics.get(key):
+                        continue
+                    if raw.get("value") is not None:
+                        try:
+                            metrics[key] = int(raw.get("value") or 0)
+                        except Exception:
+                            metrics[key] = 0
+                    elif raw.get("present"):
+                        metrics[key] = 0
+        except Exception:
+            pass
 
     if not any(metrics.values()):
         try:
@@ -847,7 +879,7 @@ def _harvest_cards_structured(page) -> List[Dict[str, Any]]:
             if (/(like|likes)/.test(lower) || /讚|赞|喜歡|喜欢/.test(label)) return "likes";
             if (/(reply|replies|comment|comments)/.test(lower) || /回覆|回复|留言/.test(label)) return "replies";
             if (/(repost|reposts|reshare|re-share)/.test(lower) || /轉發|转发|轉貼|转贴/.test(label)) return "reposts";
-            if (/(share|shares)/.test(lower) || /分享|傳送|传送/.test(label)) return "shares";
+            if (/(share|shares|send|forward)/.test(lower) || /分享|傳送|传送|轉寄|转寄/.test(label)) return "shares";
             return "";
           };
 

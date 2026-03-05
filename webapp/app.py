@@ -1,6 +1,10 @@
+import os
 import uuid
 import logging
-from typing import Optional
+import importlib
+import subprocess
+from datetime import datetime, timezone
+from functools import lru_cache
 from typing import List, Optional, Dict, Any
 import pandas as pd
 import numpy as np
@@ -23,12 +27,75 @@ from webapp.routers.api import router as api_router
 from webapp.routers import jobs  # [NEW] 引入新的 Jobs Router
 
 from webapp.services import job_store
-from webapp.services import pipeline_runner as runner
-from webapp.services.job_manager import JobManager
 from webapp.schemas.jobs import JobCreate
-from webapp.services import ops_pipeline_a_bridge
 
 logger = logging.getLogger("dl")
+
+
+def _utc_now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def _read_git_short_sha() -> str:
+    try:
+        out = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], stderr=subprocess.DEVNULL)
+        value = out.decode("utf-8", errors="ignore").strip()
+        return value or "unknown"
+    except Exception:
+        return "unknown"
+
+
+@lru_cache(maxsize=1)
+def _build_meta() -> Dict[str, str]:
+    build_sha = (os.environ.get("BUILD_SHA") or os.environ.get("GIT_SHA") or _read_git_short_sha()).strip() or "unknown"
+    build_time = (os.environ.get("BUILD_TIME") or os.environ.get("BUILD_AT") or _utc_now_iso()).strip() or _utc_now_iso()
+    env_name = (os.environ.get("ENV_NAME") or os.environ.get("APP_ENV") or os.environ.get("ENV") or "dev").strip() or "dev"
+    app_version = (os.environ.get("APP_VERSION") or os.environ.get("VERSION") or "0.0.0").strip() or "0.0.0"
+    return {
+        "build_sha": build_sha,
+        "build_time": build_time,
+        "env": env_name,
+        "version": app_version,
+    }
+
+
+
+_runner_mod = None
+_ops_pipeline_a_bridge_mod = None
+_job_manager_cls = None
+
+
+def _load_runner():
+    global _runner_mod
+    if _runner_mod is None:
+        _runner_mod = importlib.import_module("webapp.services.pipeline_runner")
+    return _runner_mod
+
+
+def _load_ops_pipeline_a_bridge():
+    global _ops_pipeline_a_bridge_mod
+    if _ops_pipeline_a_bridge_mod is None:
+        _ops_pipeline_a_bridge_mod = importlib.import_module("webapp.services.ops_pipeline_a_bridge")
+    return _ops_pipeline_a_bridge_mod
+
+
+def _get_job_manager_cls():
+    global _job_manager_cls
+    if _job_manager_cls is None:
+        _job_manager_cls = importlib.import_module("webapp.services.job_manager").JobManager
+    return _job_manager_cls
+
+
+class _LazyModuleProxy:
+    def __init__(self, loader):
+        self._loader = loader
+
+    def __getattr__(self, name):
+        return getattr(self._loader(), name)
+
+
+runner = _LazyModuleProxy(_load_runner)
+ops_pipeline_a_bridge = _LazyModuleProxy(_load_ops_pipeline_a_bridge)
 
 app = FastAPI()
 
@@ -44,6 +111,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["X-Request-ID", "X-Build-SHA", "X-Env", "Retry-After"],
 )
 
 # [Existing] 掛載原本的 API Router
@@ -60,17 +128,56 @@ def create_app() -> FastAPI:
     """
     return app
 
+@app.on_event("startup")
+async def _boot_log() -> None:
+    meta = _build_meta()
+    listen = os.environ.get("BACKEND_PORT") or os.environ.get("PORT") or "8000"
+    boot_line = f"BOOT build_sha={meta['build_sha']} env={meta['env']} pid={os.getpid()} listen={listen}"
+    logger.info(boot_line)
+    logging.getLogger("uvicorn.error").info(boot_line)
+
+
+@app.get("/api/_meta/build")
+async def get_build_meta(request: Request):
+    trace_id = getattr(getattr(request, "state", None), "trace_id", None) or request.headers.get("x-request-id") or uuid.uuid4().hex
+    try:
+        body = {"status": "ok", **_build_meta()}
+    except Exception:
+        body = {"status": "ok", "build_sha": "unknown", "build_time": _utc_now_iso(), "env": "unknown", "version": "0.0.0"}
+    return JSONResponse(body, headers={"X-Request-ID": trace_id})
+
+
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     logger.exception("Unhandled exception")
+    trace_id = getattr(getattr(request, "state", None), "trace_id", None) or uuid.uuid4().hex
     return JSONResponse(
         {
             "detail": "Unhandled exception",
             "error_type": type(exc).__name__,
             "error": str(exc),
+            "trace_id": trace_id,
+        },
+        headers={
+            "X-Request-ID": trace_id,
+            "X-Build-SHA": _build_meta()["build_sha"],
+            "X-Env": _build_meta()["env"],
         },
         status_code=500,
     )
+
+
+@app.middleware("http")
+async def request_trace_middleware(request: Request, call_next):
+    incoming = request.headers.get("x-request-id")
+    trace_id = str(incoming or uuid.uuid4().hex).strip() or uuid.uuid4().hex
+    request.state.trace_id = trace_id
+    response = await call_next(request)
+    meta = _build_meta()
+    response.headers["X-Request-ID"] = trace_id
+    response.headers["X-Build-SHA"] = meta["build_sha"]
+    response.headers["X-Env"] = meta["env"]
+    return response
 
 
 def normalize_like_counts(comments: list) -> list:
@@ -520,7 +627,7 @@ async def run_pipeline_a(
     """
     Launch Pipeline A and Redirect to Logistics Dashboard.
     """
-    manager = JobManager()
+    manager = _get_job_manager_cls()()
 
     # 1. Create Job Header
     job_in = JobCreate(

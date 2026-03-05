@@ -1,0 +1,80 @@
+{
+  "topic_api": {
+    "post_run_request": {
+      "seed_query": "public health subsidy rumor",
+      "post_ids": [109, 202, 301],
+      "time_range": {
+        "start": "2026-02-01T00:00:00Z",
+        "end": "2026-02-07T00:00:00Z"
+      },
+      "run_params": {
+        "bucket_granularity": "day",
+        "meta_cluster_algo": "kmeans",
+        "meta_cluster_k": 6
+      },
+      "source": "manual"
+    },
+    "post_run_response_accepted": {
+      "status": "accepted",
+      "reason": null,
+      "reason_code": "accepted_new",
+      "trace_id": "request-id",
+      "topic_id": "uuid",
+      "topic_run_id": "uuid",
+      "topic_run_hash": "sha256"
+    },
+    "post_run_response_idempotent": {
+      "status": "accepted",
+      "reason": null,
+      "reason_code": "idempotent_hit",
+      "trace_id": "request-id",
+      "topic_id": "uuid",
+      "topic_run_id": "uuid",
+      "topic_run_hash": "sha256"
+    },
+    "get_topic_response_pending": {
+      "status": "pending",
+      "reason": "topic_pending",
+      "reason_code": "topic_pending",
+      "trace_id": "request-id",
+      "topic_id": "uuid",
+      "topic_run": {
+        "id": "uuid",
+        "topic_run_hash": "sha256",
+        "status": "pending"
+      },
+      "topic_posts": {
+        "post_count": 3,
+        "posts_preview": []
+      },
+      "meta_clusters": {
+        "status": "pending",
+        "items": []
+      },
+      "lifecycle": {
+        "status": "pending",
+        "daily": []
+      },
+      "managed_lane": {
+        "status": "pending",
+        "summary": null
+      }
+    },
+    "get_topic_response_not_found": {
+      "status": "not_found",
+      "reason": "not_found",
+      "reason_code": "not_found",
+      "detail": "Topic run not found",
+      "trace_id": "request-id",
+      "topic_id": "uuid"
+    },
+    "get_topic_response_validation_error": {
+      "status": "error",
+      "reason": "validation_error",
+      "reason_code": "validation_error",
+      "detail": "invalid topic_id",
+      "trace_id": "request-id",
+      "topic_id": "not-a-uuid"
+    }
+  }
+}

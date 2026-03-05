@@ -21,6 +21,8 @@ from webapp.schemas.jobs import JobCreate
 from webapp.services.pipeline_runner import run_pipeline_a_job, process_pipeline_b_backend
 
 logger = logging.getLogger(__name__)
+_JOB_STALE_SECONDS = int(os.environ.get("JOB_STALE_SECONDS") or 600)
+_JOB_DISCOVERING_STALE_SECONDS = int(os.environ.get("JOB_DISCOVERING_STALE_SECONDS") or 180)
 
 # ----------------------------
 # In-memory cache (bounded)
@@ -44,6 +46,25 @@ def _cache_del_prefix(prefix: str):
     for k in list(_CACHE_STORE.keys()):
         if k.startswith(prefix):
             _CACHE_STORE.pop(k, None)
+
+
+def _parse_ts(value: Any) -> Optional[datetime]:
+    if not value:
+        return None
+    if isinstance(value, datetime):
+        return value if value.tzinfo else value.replace(tzinfo=timezone.utc)
+    try:
+        text = str(value)
+        return datetime.fromisoformat(text.replace("Z", "+00:00"))
+    except Exception:
+        return None
+
+
+def _as_non_negative_int(value: Any) -> int:
+    try:
+        return max(0, int(value or 0))
+    except Exception:
+        return 0
 
 
 class JobManager:
@@ -141,6 +162,66 @@ class JobManager:
 
         async with self._lock:
             return await self._cached_call(cache_key, 2.0, _call)
+
+    def _normalized_status_from_header(self, row: Dict[str, Any], now: Optional[datetime] = None) -> str:
+        now = now or datetime.now(timezone.utc)
+        raw_status = str(row.get("status") or "").strip().lower()
+        if not raw_status:
+            raw_status = "processing"
+
+        total = _as_non_negative_int(row.get("total_count"))
+        processed = _as_non_negative_int(row.get("processed_count"))
+        failed = _as_non_negative_int(row.get("failed_count"))
+        heartbeat_ts = _parse_ts(row.get("last_heartbeat_at"))
+        updated_ts = _parse_ts(row.get("updated_at"))
+        anchor_ts = heartbeat_ts or updated_ts
+        has_remaining = total == 0 or processed < total
+
+        if raw_status in {"completed", "failed", "canceled"}:
+            return raw_status
+
+        if total > 0 and processed >= total:
+            return "failed" if failed > 0 else "completed"
+
+        if raw_status == "queued":
+            return "queued"
+
+        if raw_status in {"discovering", "pending"}:
+            if anchor_ts and (now - anchor_ts).total_seconds() > _JOB_DISCOVERING_STALE_SECONDS:
+                return "queued" if total == 0 else "stale"
+            return "discovering" if total == 0 else "processing"
+
+        if raw_status == "stale":
+            if anchor_ts and has_remaining and (now - anchor_ts).total_seconds() <= _JOB_STALE_SECONDS:
+                return "processing"
+            return "stale"
+
+        if anchor_ts and has_remaining and (now - anchor_ts).total_seconds() > _JOB_STALE_SECONDS:
+            return "stale"
+
+        if raw_status in {"running", "init"}:
+            return "processing"
+        if raw_status not in {"processing"}:
+            return raw_status
+        return "processing"
+
+    def normalize_job_batch(self, row: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+        if not row:
+            return row
+        normalized = dict(row)
+        normalized["status"] = self._normalized_status_from_header(row)
+        return normalized
+
+    def normalize_job_list(self, rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        now = datetime.now(timezone.utc)
+        normalized_rows: List[Dict[str, Any]] = []
+        for row in rows or []:
+            if not isinstance(row, dict):
+                continue
+            item = dict(row)
+            item["status"] = self._normalized_status_from_header(row, now=now)
+            normalized_rows.append(item)
+        return normalized_rows
 
     # ------------------------------------------------------------------
     # Write helpers
@@ -267,6 +348,54 @@ class JobManager:
             patch["total_count"] = total_count
         await self._table_update("job_batches", job_id, patch)
 
+    async def cancel_job(self, job_id: str) -> Optional[Dict[str, Any]]:
+        """
+        Best-effort cancel:
+        - mark batch as canceled
+        - mark pending/processing items as canceled
+        """
+        now_iso = datetime.now(tz=timezone.utc).isoformat()
+        batch = await self._table_select_single("job_batches", job_id)
+        if not batch:
+            return None
+
+        current_status = str(batch.get("status") or "").lower()
+        if current_status in {"completed", "failed", "canceled"}:
+            return batch
+
+        await self._table_update(
+            "job_batches",
+            job_id,
+            {
+                "status": "canceled",
+                "finished_at": now_iso,
+                "error_summary": "Canceled by operator",
+                "updated_at": now_iso,
+            },
+        )
+
+        async def _cancel_items():
+            return await asyncio.to_thread(
+                lambda: self.db.table("job_items")
+                .update({"status": "canceled", "stage": "canceled", "updated_at": now_iso})
+                .eq("job_id", job_id)
+                .in_("status", ["pending", "processing"])
+                .execute()
+            )
+
+        async with self._lock:
+            await self._retry_db(_cancel_items)
+
+        _cache_del_prefix("jobs_list:")
+        _cache_del_prefix(f"job_items:{job_id}:")
+        return await self._table_select_single("job_batches", job_id)
+
+    async def is_job_canceled(self, job_id: str) -> bool:
+        row = await self._table_select_single("job_batches", job_id)
+        if not row:
+            return True
+        return str(row.get("status") or "").lower() == "canceled"
+
     async def set_job_heartbeat(self, job_id: str):
         await self._table_update("job_batches", job_id, {"last_heartbeat_at": datetime.now(tz=timezone.utc).isoformat()})
 
@@ -320,33 +449,20 @@ class JobManager:
         else:
             items = res.data or []
 
-        def _parse_ts(ts: Any) -> Optional[datetime]:
-            if not ts:
-                return None
-            try:
-                return datetime.fromisoformat(ts.replace("Z", "+00:00"))
-            except Exception:
-                return None
-
         total = len(items)
         success = sum(1 for it in items if (it.get("status") == "completed") or (it.get("stage") == "completed"))
         failed = sum(1 for it in items if (it.get("status") == "failed") or (it.get("stage") == "failed"))
         processed = success + failed
         last_item_ts = None
         if items:
-            last_item_ts = max((_parse_ts(it.get("updated_at")) for it in items if _parse_ts(it.get("updated_at"))), default=None)
+            ts_values = (_parse_ts(it.get("updated_at")) for it in items)
+            last_item_ts = max((ts for ts in ts_values if ts), default=None)
 
-        hb_ts = _parse_ts(header.get("last_heartbeat_at"))
-
-        status = "processing"
-        if total > 0 and processed >= total:
-            status = "completed"
-            if failed > 0:
-                status = "failed"
-        if hb_ts and total > 0 and processed < total:
-            age = (datetime.now(timezone.utc) - hb_ts).total_seconds()
-            if age > 60:
-                status = "stale"
+        status_header = dict(header)
+        status_header["total_count"] = total
+        status_header["processed_count"] = processed
+        status_header["failed_count"] = failed
+        status = self._normalized_status_from_header(status_header)
 
         summary = {
             "job_id": job_id,
@@ -540,6 +656,9 @@ class JobManager:
             loop = asyncio.get_running_loop()
             while True:
                 await self.set_job_heartbeat(job_id)
+                if await self.is_job_canceled(job_id):
+                    logger.info("[worker %s] job canceled -> stop loop job_id=%s", w_id, job_id)
+                    break
                 item = await self.claim_next_item(job_id, w_id)
                 if not item:
                     break

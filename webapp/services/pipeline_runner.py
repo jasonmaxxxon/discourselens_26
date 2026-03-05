@@ -12,14 +12,53 @@ from starlette.concurrency import run_in_threadpool
 from dotenv import load_dotenv
 
 load_dotenv()
-from pipelines.core import run_pipeline, run_pipelines
+PIPELINES_AVAILABLE = True
+try:
+    from pipelines.core import run_pipeline, run_pipelines  # type: ignore
+except Exception as e:
+    PIPELINES_AVAILABLE = False
+
+    def run_pipeline(*args, **kwargs):  # type: ignore
+        raise RuntimeError("pipelines.core missing; Pipeline B/C disabled")
+
+    def run_pipelines(*args, **kwargs):  # type: ignore
+        raise RuntimeError("pipelines.core missing; Pipeline B/C disabled")
+
 from database.store import supabase
-from event_crawler import discover_thread_urls, rank_posts, save_hotlist
-from home_crawler import (
-    collect_home_posts,
-    filter_posts_by_threshold,
-    save_home_hotlist,
-)
+
+EVENT_CRAWLER_AVAILABLE = True
+try:
+    from event_crawler import discover_thread_urls, rank_posts, save_hotlist  # type: ignore
+except Exception:
+    EVENT_CRAWLER_AVAILABLE = False
+
+    def discover_thread_urls(*args, **kwargs):  # type: ignore
+        raise RuntimeError("event_crawler missing; Pipeline B disabled")
+
+    def rank_posts(*args, **kwargs):  # type: ignore
+        raise RuntimeError("event_crawler missing; Pipeline B disabled")
+
+    def save_hotlist(*args, **kwargs):  # type: ignore
+        raise RuntimeError("event_crawler missing; Pipeline B disabled")
+
+HOME_CRAWLER_AVAILABLE = True
+try:
+    from home_crawler import (  # type: ignore
+        collect_home_posts,
+        filter_posts_by_threshold,
+        save_home_hotlist,
+    )
+except Exception:
+    HOME_CRAWLER_AVAILABLE = False
+
+    def collect_home_posts(*args, **kwargs):  # type: ignore
+        raise RuntimeError("home_crawler missing; Pipeline C disabled")
+
+    def filter_posts_by_threshold(*args, **kwargs):  # type: ignore
+        raise RuntimeError("home_crawler missing; Pipeline C disabled")
+
+    def save_home_hotlist(*args, **kwargs):  # type: ignore
+        raise RuntimeError("home_crawler missing; Pipeline C disabled")
 from scraper.fetcher import normalize_url, run_fetcher_test
 from webapp.services import job_store
 from webapp.services.ingest_sql import ingest_run
@@ -39,35 +78,49 @@ except Exception:
             return [jsonable_encoder(v) for v in obj]
         return obj
 
-# --- Preanalysis module (safe import) ---
-try:
-    from analysis.preanalysis_runner import run_preanalysis
-    PREANALYSIS_AVAILABLE = True
-    print("✅ Preanalysis module loaded successfully.")
-except ImportError as e:
-    print(f"⚠️ Preanalysis Module Warning: {e}")
-    PREANALYSIS_AVAILABLE = False
-    run_preanalysis = None
+# --- Preanalysis / CIP modules (lazy import to avoid startup stalls) ---
+PREANALYSIS_AVAILABLE = False
+CIP_AVAILABLE = False
+run_preanalysis = None
+run_cluster_interpretation = None
+_PREANALYSIS_LOADED = False
+_CIP_LOADED = False
 
-# --- CIP module (safe import) ---
-try:
-    from analysis.cluster_interpretation import run_cluster_interpretation
-    CIP_AVAILABLE = True
-    print("✅ Cluster Interpretation module loaded successfully.")
-except ImportError as e:
-    print(f"⚠️ Cluster Interpretation Module Warning: {e}")
-    CIP_AVAILABLE = False
-    run_cluster_interpretation = None
 
-# --- AI modules (safe import) ---
-try:
-    from analysis.analyst import generate_commercial_report
-    AI_AVAILABLE = True
-    print("✅ AI Modules loaded successfully.")
-except ImportError as e:
-    print(f"⚠️ AI Module Warning: {e}")
-    AI_AVAILABLE = False
-    generate_commercial_report = None
+def _ensure_preanalysis_loaded() -> bool:
+    global PREANALYSIS_AVAILABLE, run_preanalysis, _PREANALYSIS_LOADED
+    if _PREANALYSIS_LOADED:
+        return PREANALYSIS_AVAILABLE and run_preanalysis is not None
+    _PREANALYSIS_LOADED = True
+    try:
+        from analysis.preanalysis_runner import run_preanalysis as _run_preanalysis
+        run_preanalysis = _run_preanalysis
+        PREANALYSIS_AVAILABLE = True
+        logger.info("Preanalysis module loaded successfully.")
+    except Exception as e:
+        PREANALYSIS_AVAILABLE = False
+        run_preanalysis = None
+        logger.warning("Preanalysis module unavailable: %s", e)
+    return PREANALYSIS_AVAILABLE and run_preanalysis is not None
+
+
+def _ensure_cip_loaded() -> bool:
+    global CIP_AVAILABLE, run_cluster_interpretation, _CIP_LOADED
+    if _CIP_LOADED:
+        return CIP_AVAILABLE and run_cluster_interpretation is not None
+    _CIP_LOADED = True
+    try:
+        from analysis.cluster_interpretation import run_cluster_interpretation as _run_cluster_interpretation
+        run_cluster_interpretation = _run_cluster_interpretation
+        CIP_AVAILABLE = True
+        logger.info("Cluster Interpretation module loaded successfully.")
+    except Exception as e:
+        CIP_AVAILABLE = False
+        run_cluster_interpretation = None
+        logger.warning("Cluster Interpretation module unavailable: %s", e)
+    return CIP_AVAILABLE and run_cluster_interpretation is not None
+
+# --- AI modules (legacy analyst removed; claims runner is used instead) ---
 build_evidence_bundle = None
 embed_text = None
 embedding_hash = None
@@ -87,9 +140,9 @@ def canonicalize_url(url: str) -> str:
 
 
 def _maybe_launch_cip(post_id: str) -> None:
-    if os.getenv("DL_ENABLE_CIP", "0") not in {"1", "true", "TRUE"}:
+    if os.getenv("DL_ENABLE_CIP", "1") not in {"1", "true", "TRUE"}:
         return
-    if not CIP_AVAILABLE or not run_cluster_interpretation:
+    if not _ensure_cip_loaded() or not run_cluster_interpretation:
         logger.warning("[CIP] module unavailable; skipping post_id=%s", post_id)
         return
     try:
@@ -433,7 +486,7 @@ def run_pipeline_a_job(job_id: str, url: str, item_id: str | None = None, stage_
 
     _stage("analyst")
     _progressive_job_item_update(job_id, safe_url, stage="analyst", status="processing", result_post_id=post_id)
-    if not PREANALYSIS_AVAILABLE or not run_preanalysis:
+    if not _ensure_preanalysis_loaded() or not run_preanalysis:
         raise RuntimeError("PREANALYSIS_MODULES_UNAVAILABLE")
     try:
         run_preanalysis(int(post_id), prefer_sot=True, persist_assignments=True)
@@ -441,6 +494,19 @@ def run_pipeline_a_job(job_id: str, url: str, item_id: str | None = None, stage_
         logger.exception("[Runner] Preanalysis failed post_id=%s", post_id)
         raise
     _maybe_launch_cip(post_id)
+
+    # Claims + Evidence only (no legacy narrative / academic base)
+    try:
+        from analysis.claims_runner import run_claims_only_for_post
+
+        use_stub = os.getenv("DL_LLM_STUB", "").lower() in {"1", "true"}
+        if not os.getenv("GEMINI_API_KEY") and not use_stub:
+            os.environ["DL_LLM_STUB"] = "1"
+            use_stub = True
+            logger.warning("[Runner] GEMINI_API_KEY missing; enabling DL_LLM_STUB for claims_only.")
+        run_claims_only_for_post(int(post_id), use_stub=use_stub)
+    except Exception:
+        logger.exception("[Runner] Claims runner failed post_id=%s", post_id)
 
     _stage("store")
     _progressive_job_item_update(job_id, safe_url, stage="store", status="processing", result_post_id=post_id)
@@ -680,7 +746,7 @@ async def process_pipeline_b_backend(
                 # Vision/OCR disabled in this repo build.
 
                 logs.append(f"[{idx}/{len(scheduled)}] stage=preanalysis start url={url}")
-                if not PREANALYSIS_AVAILABLE or not run_preanalysis:
+                if not _ensure_preanalysis_loaded() or not run_preanalysis:
                     raise RuntimeError("PREANALYSIS_MODULES_UNAVAILABLE")
                 preanalysis_res = await run_in_threadpool(
                     run_preanalysis,

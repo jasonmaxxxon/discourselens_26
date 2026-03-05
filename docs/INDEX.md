@@ -18,3 +18,9 @@ This folder is the single source of truth for how the system works. A new engine
 ## Build and Operations
 - `docs/ARCHITECTURE.md` — Component map and boundaries.
 - `docs/DEV_RUNBOOK.md` — Local setup and operator commands.
+
+## Integration Gate Specs (CDX Week1)
+- `docs/cdx-week1/01_ENDPOINT_CATALOG.md` — Endpoint-level contract deltas for Topic API skeleton.
+- `docs/cdx-week1/03_ANALYSIS_OBJECT_CONTRACT.md` — Request/response payload SoT for Topic registry.
+- `docs/cdx-week1/04_DATAFLOW.mmd` — Registry + gate execution flow.
+- `docs/cdx-week1/06_GOLDEN_PAYLOADS.json` — Golden payload snapshots for lifecycle/edge-case assertions.
