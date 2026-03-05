@@ -37,11 +37,41 @@ Response:
 ```
 Must never return 500.
 
-### Topic API Status
-Topic Engine V1 contract and schema are provisioned, but production routes are not wired yet.
-- Contract: `docs/TOPIC_CONTRACT_V1.md`
-- Schema migration: `supabase/migrations/20260226150000_topic_engine_phase2_sot.sql`
-- `/api/topics/*`: not available in current backend build
+### POST /api/topics/run
+Purpose: Register immutable Topic Run snapshot (Phase-3 skeleton, registry only).
+Request body (minimal):
+```json
+{
+  "seed_query": "public health subsidy rumor",
+  "post_ids": [109, 202, 301],
+  "time_range": {
+    "start": "2026-02-01T00:00:00Z",
+    "end": "2026-02-07T00:00:00Z"
+  }
+}
+```
+Supported aliases:
+- `seed_post_ids` can be used instead of `post_ids`.
+- `time_range_start` / `time_range_end` can be used instead of nested `time_range`.
+
+Response:
+- `200 accepted` on new insert or idempotent hash hit.
+- `400 validation_error` for bad payload (empty post_ids, invalid topic_id, invalid time range, missing posts).
+- `200 pending` when backend/topic tables are temporarily unavailable.
+Never returns `500` (topic-specific never-500 envelope).
+
+### GET /api/topics/{topic_id}
+Purpose: Read topic snapshot registry row + posts preview (no meta-cluster/lifecycle compute yet).
+Response:
+- `200 ready|pending|failed` with `topic_run` and `topic_posts`.
+- `404 not_found` when topic id does not exist.
+- `400 validation_error` when topic_id is malformed UUID.
+Never returns `500` (topic-specific never-500 envelope).
+
+Notes:
+- Contract SoT: `docs/TOPIC_CONTRACT_V1.md`
+- Schema SoT: `supabase/migrations/20260226150000_topic_engine_phase2_sot.sql`
+- Current phase only covers registry; no cross-post compute/materialization in these endpoints.
 
 ### GET /api/overview/telemetry
 Purpose: Backend-owned Overview telemetry model for Timeline Drift / Comment Momentum cards.

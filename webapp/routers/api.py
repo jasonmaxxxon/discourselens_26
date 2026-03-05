@@ -16,6 +16,8 @@ import math
 import json as _json
 import numpy as np
 
+from webapp.services import topic_store
+
 router = APIRouter()
 
 
@@ -170,6 +172,9 @@ def _classify_exception(exc: Exception) -> Dict[str, Any]:
         'temporarily unavailable',
         'server disconnected',
         'econnreset',
+        'pgrst205',
+        'schema cache',
+        'could not find the table',
     )
     if any(token in msg for token in transport_tokens) or 'timeout' in name.lower() or 'httpx' in name.lower():
         return {'kind': 'UPSTREAM_TRANSPORT', 'retriable': True, 'message_safe': 'Upstream transport error'}
@@ -271,6 +276,53 @@ def _response_for_exception(
             payload.update(extra)
         return JSONResponse(payload, status_code=400, headers={'X-Request-ID': trace_id})
     return _error_response(response, trace_id=trace_id, detail=f"{pending_reason}: {classified.get('message_safe') or 'internal error'}")
+
+
+def _topic_response_for_exception(
+    exc: Exception,
+    response: Optional[Response],
+    trace_id: str,
+    pending_reason: str,
+    pending_detail: str,
+    extra: Optional[Dict[str, Any]] = None,
+) -> JSONResponse:
+    """
+    Topic endpoints must never emit HTTP 500.
+    VALIDATION_ERROR -> 400, NOT_FOUND -> 404, everything else -> 200/pending.
+    """
+    classified = _classify_exception(exc)
+    kind = classified.get("kind")
+    if kind == "VALIDATION_ERROR":
+        payload: Dict[str, Any] = {
+            "status": "error",
+            "reason": "validation_error",
+            "reason_code": "validation_error",
+            "detail": classified.get("message_safe") or "Validation error",
+            "trace_id": trace_id,
+        }
+        if extra:
+            payload.update(extra)
+        return JSONResponse(payload, status_code=400, headers={"X-Request-ID": trace_id})
+    if kind == "NOT_FOUND":
+        payload = {
+            "status": "not_found",
+            "reason": "not_found",
+            "reason_code": "not_found",
+            "detail": classified.get("message_safe") or "Resource not found",
+            "trace_id": trace_id,
+        }
+        if extra:
+            payload.update(extra)
+        return JSONResponse(payload, status_code=404, headers={"X-Request-ID": trace_id})
+
+    _set_degraded_response(response)
+    payload = _pending_payload(
+        trace_id=trace_id,
+        reason_code=pending_reason,
+        detail=pending_detail,
+        extra=extra,
+    )
+    return JSONResponse(payload, status_code=200, headers={"X-Request-ID": trace_id})
 
 
 
@@ -610,6 +662,89 @@ def _load_post_row(post_id: str, select_fields: str = "id") -> tuple[Optional[Di
     row = rows[0] if isinstance(rows[0], dict) else None
     return (row, False)
 
+
+def _topic_lifecycle_status(raw_status: Any) -> str:
+    status = str(raw_status or "").strip().lower()
+    if status == "completed":
+        return "ready"
+    if status in {"failed", "canceled"}:
+        return "failed"
+    return "pending"
+
+
+def _topic_detail_payload(trace_id: str, run_row: Dict[str, Any], posts_page: Dict[str, Any]) -> Dict[str, Any]:
+    posts_preview = []
+    for row in (posts_page.get("rows") or []):
+        if not isinstance(row, dict):
+            continue
+        try:
+            post_id = int(row.get("post_id"))
+        except Exception:
+            post_id = row.get("post_id")
+        posts_preview.append(
+            {
+                "post_id": post_id,
+                "ordinal": row.get("ordinal"),
+                "inclusion_source": row.get("inclusion_source"),
+                "inclusion_reason": row.get("inclusion_reason"),
+                "post_created_at": row.get("post_created_at"),
+            }
+        )
+
+    lifecycle_status = _topic_lifecycle_status(run_row.get("status"))
+    reason_code: Optional[str] = None
+    if lifecycle_status == "pending":
+        reason_code = "topic_pending"
+    elif lifecycle_status == "failed":
+        reason_code = "topic_failed"
+    return {
+        "status": lifecycle_status,
+        "reason": reason_code,
+        "reason_code": reason_code,
+        "trace_id": trace_id,
+        "topic_id": str(run_row.get("id")),
+        "topic_run": {
+            "id": str(run_row.get("id")),
+            "topic_name": run_row.get("topic_name"),
+            "seed_query": run_row.get("seed_query"),
+            "seed_post_ids": run_row.get("seed_post_ids") or [],
+            "time_range_start": run_row.get("time_range_start"),
+            "time_range_end": run_row.get("time_range_end"),
+            "run_params": run_row.get("run_params") or {},
+            "topic_run_hash": run_row.get("topic_run_hash"),
+            "lifecycle_hash": run_row.get("lifecycle_hash"),
+            "status": run_row.get("status"),
+            "source": run_row.get("source"),
+            "freshness_lag_seconds": run_row.get("freshness_lag_seconds"),
+            "coverage_gap": bool(run_row.get("coverage_gap")),
+            "stats_json": run_row.get("stats_json") or {},
+            "created_by": run_row.get("created_by"),
+            "error_summary": run_row.get("error_summary"),
+            "created_at": run_row.get("created_at"),
+            "updated_at": run_row.get("updated_at"),
+            "started_at": run_row.get("started_at"),
+            "finished_at": run_row.get("finished_at"),
+        },
+        "topic_posts": {
+            "post_count": int(posts_page.get("total") or 0),
+            "posts_preview": posts_preview,
+            "limit": int(posts_page.get("limit") or len(posts_preview)),
+            "offset": int(posts_page.get("offset") or 0),
+        },
+        "meta_clusters": {
+            "status": "pending",
+            "items": [],
+        },
+        "lifecycle": {
+            "status": "pending",
+            "daily": [],
+        },
+        "managed_lane": {
+            "status": "pending",
+            "summary": None,
+        },
+    }
+
 # --- Pydantic models (unchanged) ---
 
 
@@ -680,6 +815,24 @@ class CasebookCreateRequest(BaseModel):
     summary_version: str = "casebook_summary_v1"
     filters: CasebookFilterSnapshot
     analyst_note: Optional[str] = None
+
+
+class TopicTimeRange(BaseModel):
+    start: str
+    end: str
+
+
+class TopicRunCreateRequest(BaseModel):
+    topic_name: Optional[str] = None
+    seed_query: str
+    post_ids: Optional[List[Any]] = None
+    seed_post_ids: Optional[List[Any]] = None
+    time_range: Optional[TopicTimeRange] = None
+    time_range_start: Optional[str] = None
+    time_range_end: Optional[str] = None
+    run_params: Optional[Dict[str, Any]] = None
+    source: Optional[str] = "manual"
+    created_by: Optional[str] = None
 
 
 class AcademicReference(BaseModel):
@@ -2720,6 +2873,152 @@ def promote_phenomenon(phenomenon_id: str, response: Response, request: Request)
         )
 
     return {"ok": True, "id": phenomenon_id, "status": "active", "trace_id": trace_id}
+
+
+@router.post("/topics/run")
+def create_topic_run_registry(payload: TopicRunCreateRequest, response: Response, request: Request):
+    trace_id = _trace_id_from_request(request)
+    _attach_trace_id(response, trace_id)
+
+    try:
+        seed_query = " ".join((payload.seed_query or "").strip().split())
+        if not seed_query:
+            raise ValueError("seed_query is required")
+        if len(seed_query) > 256:
+            raise ValueError("seed_query exceeds limit 256")
+
+        raw_post_ids = payload.post_ids if payload.post_ids is not None else payload.seed_post_ids
+        canonical_post_ids = topic_store.canonicalize_post_ids(raw_post_ids or [], max_items=500)
+
+        missing_post_ids = topic_store.validate_post_ids_exist(runner.supabase, canonical_post_ids)
+        if missing_post_ids:
+            raise ValueError(f"post_ids not found: {missing_post_ids[:20]}")
+
+        tr_start = payload.time_range_start
+        tr_end = payload.time_range_end
+        if payload.time_range is not None:
+            tr_start = payload.time_range.start
+            tr_end = payload.time_range.end
+        time_range_start, time_range_end = topic_store.resolve_time_range(
+            runner.supabase,
+            post_ids=canonical_post_ids,
+            time_range_start=tr_start,
+            time_range_end=tr_end,
+        )
+
+        hash_payload = topic_store.build_topic_run_hash_payload(
+            seed_query=seed_query,
+            time_range_start=time_range_start,
+            time_range_end=time_range_end,
+            post_ids=canonical_post_ids,
+        )
+        topic_run_hash = hash_payload["topic_run_hash"]
+
+        topic_name = topic_store.normalize_topic_name(payload.topic_name, seed_query)
+        run_params = payload.run_params if isinstance(payload.run_params, dict) else {}
+        source = str(payload.source or "manual").strip()[:64] or "manual"
+        created_by = str(payload.created_by).strip()[:120] if payload.created_by else None
+
+        run_row, idempotent_hit = topic_store.create_topic_run(
+            runner.supabase,
+            topic_name=topic_name,
+            seed_query=seed_query,
+            seed_post_ids=canonical_post_ids,
+            time_range_start=time_range_start,
+            time_range_end=time_range_end,
+            run_params=run_params,
+            source=source,
+            created_by=created_by,
+            topic_run_hash=topic_run_hash,
+        )
+
+        if not idempotent_hit:
+            topic_store.bulk_insert_topic_posts(
+                runner.supabase,
+                topic_run_id=str(run_row.get("id")),
+                post_ids=canonical_post_ids,
+                inclusion_source="seed",
+                inclusion_reason="seed_post_ids",
+            )
+
+        return {
+            "status": "accepted",
+            "reason": None,
+            "reason_code": "idempotent_hit" if idempotent_hit else "accepted_new",
+            "trace_id": trace_id,
+            "topic_id": str(run_row.get("id")),
+            "topic_run_id": str(run_row.get("id")),
+            "topic_run_hash": topic_run_hash,
+        }
+    except Exception as exc:
+        kind = _classify_exception(exc).get("kind")
+        if kind in {"VALIDATION_ERROR", "UPSTREAM_TRANSPORT"}:
+            runner.logger.info("api/topics/run handled failure kind=%s err=%s", kind, exc)
+        else:
+            runner.logger.exception("api/topics/run failed")
+        return _topic_response_for_exception(
+            exc=exc,
+            response=response,
+            trace_id=trace_id,
+            pending_reason="topic_registry_pending",
+            pending_detail="Topic registry temporarily unavailable.",
+            extra={
+                "topic_id": None,
+                "topic_run_id": None,
+                "topic_run_hash": None,
+            },
+        )
+
+
+@router.get("/topics/{topic_id}")
+def get_topic_run_registry(topic_id: str, response: Response, request: Request, limit: int = 20, offset: int = 0):
+    trace_id = _trace_id_from_request(request)
+    _attach_trace_id(response, trace_id)
+
+    try:
+        try:
+            normalized_topic_id = str(uuid.UUID(str(topic_id).strip()))
+        except Exception as exc:
+            raise ValueError("invalid topic_id") from exc
+
+        run_row = topic_store.get_topic_run(runner.supabase, normalized_topic_id)
+        if not run_row:
+            return _json_with_trace(
+                {
+                    "status": "not_found",
+                    "reason": "not_found",
+                    "reason_code": "not_found",
+                    "detail": "Topic run not found",
+                    "trace_id": trace_id,
+                    "topic_id": normalized_topic_id,
+                },
+                status_code=404,
+                trace_id=trace_id,
+            )
+
+        posts_page = topic_store.list_topic_posts(
+            runner.supabase,
+            normalized_topic_id,
+            limit=max(1, min(limit, 50)),
+            offset=max(0, offset),
+        )
+        return _topic_detail_payload(trace_id=trace_id, run_row=run_row, posts_page=posts_page)
+    except Exception as exc:
+        kind = _classify_exception(exc).get("kind")
+        if kind in {"VALIDATION_ERROR", "UPSTREAM_TRANSPORT"}:
+            runner.logger.info("api/topics/{topic_id} handled failure kind=%s err=%s", kind, exc)
+        else:
+            runner.logger.exception("api/topics/{topic_id} failed")
+        return _topic_response_for_exception(
+            exc=exc,
+            response=response,
+            trace_id=trace_id,
+            pending_reason="topic_registry_pending",
+            pending_detail="Topic detail temporarily unavailable.",
+            extra={
+                "topic_id": str(topic_id),
+            },
+        )
 
 
 @router.post("/reviews")

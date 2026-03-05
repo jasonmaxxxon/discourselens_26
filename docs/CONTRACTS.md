@@ -8,7 +8,8 @@ Topic/Case deterministic run contracts (input shape, canonical hashes, lifecycle
 
 Current status:
 - Topic schema tables are provisioned.
-- Public `/api/topics/*` contracts are not wired in backend routes yet.
+- Public `/api/topics/run` and `/api/topics/{topic_id}` registry routes are wired (Phase-3 skeleton).
+- Meta-cluster/lifecycle compute is still pending worker materialization.
 
 ## Runtime Provenance Headers
 Every `/api/*` response includes:
@@ -43,6 +44,84 @@ Returned by `/api/_meta/build`.
   "version": "0.0.0"
 }
 ```
+
+## TopicRunCreateRequest (Phase-3 skeleton)
+Returned by `POST /api/topics/run` request body.
+```json
+{
+  "topic_name": "optional display name",
+  "seed_query": "public health subsidy rumor",
+  "post_ids": [109, 202, 301],
+  "time_range": {
+    "start": "2026-02-01T00:00:00Z",
+    "end": "2026-02-07T00:00:00Z"
+  },
+  "run_params": {},
+  "source": "manual",
+  "created_by": "operator@team"
+}
+```
+Notes:
+- `seed_post_ids` is accepted as alias for `post_ids`.
+- `time_range_start`/`time_range_end` are accepted aliases for `time_range`.
+- `post_ids` canonicalization: unique + numeric sort.
+
+## TopicRunCreateResponse (Phase-3 skeleton)
+Returned by `POST /api/topics/run`.
+```json
+{
+  "status": "accepted",
+  "reason": null,
+  "reason_code": "accepted_new|idempotent_hit",
+  "trace_id": "<x-request-id>",
+  "topic_id": "<uuid>",
+  "topic_run_id": "<uuid>",
+  "topic_run_hash": "<sha256>"
+}
+```
+Status contract:
+- `200 accepted` for both fresh insert and idempotent reuse.
+- `400 validation_error` for malformed payload.
+- `200 pending` for backend unavailable states.
+- never `500`.
+
+## TopicRunDetailResponse (Phase-3 skeleton)
+Returned by `GET /api/topics/{topic_id}`.
+```json
+{
+  "status": "ready|pending|failed|not_found|error",
+  "reason": "topic_pending|topic_failed|not_found|validation_error|null",
+  "reason_code": "topic_pending|topic_failed|not_found|validation_error|null",
+  "trace_id": "<x-request-id>",
+  "topic_id": "<uuid>",
+  "topic_run": {
+    "id": "<uuid>",
+    "topic_name": "string",
+    "seed_query": "string",
+    "seed_post_ids": [109, 202, 301],
+    "time_range_start": "iso8601",
+    "time_range_end": "iso8601",
+    "run_params": {},
+    "topic_run_hash": "<sha256>",
+    "lifecycle_hash": null,
+    "status": "pending|running|completed|failed|canceled"
+  },
+  "topic_posts": {
+    "post_count": 3,
+    "posts_preview": [
+      { "post_id": 109, "ordinal": 0 }
+    ]
+  },
+  "meta_clusters": { "status": "pending", "items": [] },
+  "lifecycle": { "status": "pending", "daily": [] },
+  "managed_lane": { "status": "pending", "summary": null }
+}
+```
+Status contract:
+- malformed uuid -> `400 validation_error`
+- missing id -> `404 not_found`
+- backend unavailable -> `200 pending`
+- never `500`
 
 ## Pipeline B Batch Request
 ```json

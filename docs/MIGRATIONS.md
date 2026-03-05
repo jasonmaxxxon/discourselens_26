@@ -135,3 +135,13 @@ For full DDL, read the SQL files themselves.
   - create table: public.topic_runs, public.topic_posts, public.topic_meta_clusters, public.topic_lifecycle_daily
   - create indexes: topic run/meta/lifecycle query paths
   - add FK: topic_lifecycle_daily(topic_run_id, meta_cluster_key) -> topic_meta_clusters
+
+## Topic Merge Gates (Phase-3)
+
+- `make topic:migration_smoke`
+  - runs `scripts/migration_smoke_topic_phase2.py`
+  - validates topic schema presence + CRUD + deterministic hash roundtrip + key constraints
+
+- `make topic:api_contract`
+  - runs `scripts/verify_topic_api_contract.py`
+  - validates Topic API registry contract (`POST /api/topics/run`, `GET /api/topics/{id}`) and provenance headers

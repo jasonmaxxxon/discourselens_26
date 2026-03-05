@@ -180,7 +180,7 @@ Result:
 - Runtime drift becomes observable immediately.
 - UI trust is tied to backend contract states, not hidden fallback data.
 
-## Flow 9: Topic SoT Materialization (Phase-2, schema-only)
+## Flow 9: Topic SoT Materialization (Phase-2 schema)
 Trigger: Supabase migration `20260226150000_topic_engine_phase2_sot.sql`
 
 Steps:
@@ -200,5 +200,52 @@ Writes:
 - DDL only (no runtime data ingestion in this phase).
 
 Result:
-- Topic-level SoT is physically provisioned for upcoming `/api/topics/*` and cross-post compute workers.
-- Current UI remains post-centric; topic execution flow is not yet wired.
+- Topic-level SoT is physically provisioned for `/api/topics/*` registry routes and upcoming cross-post compute workers.
+- Current phase still does not materialize meta-clusters/lifecycle compute in runtime workers.
+
+## Flow 10: Topic Registry API Skeleton (Phase-3)
+Trigger:
+- `POST /api/topics/run`
+- `GET /api/topics/{topic_id}`
+
+Steps:
+1. Validate deterministic inputs (`seed_query`, `post_ids`, optional time range aliases).
+2. Canonicalize:
+   - `post_ids`: unique + sorted numeric list.
+   - time range: canonical UTC ISO8601.
+3. Compute `topic_run_hash` using Topic Contract V1 canonical hash discipline.
+4. Insert immutable registry row (`topic_runs`) and seed membership rows (`topic_posts`).
+   - On hash collision, return existing run (`idempotent_hit`).
+5. Return envelope payload with trace id and hash.
+6. For `GET`, return run metadata + posts preview; meta/lifecycle lanes remain `pending` placeholders.
+
+Writes:
+- `topic_runs`
+- `topic_posts`
+
+Status semantics:
+- `200 accepted` for create.
+- `200 pending` for transient/unavailable backend states.
+- `400 validation_error` for bad input.
+- `404 not_found` for missing topic id.
+- Never `500` for these endpoints.
+
+## Flow 11: Topic Merge Gates (Migration + API Contract)
+Trigger:
+- `make topic:migration_smoke`
+- `make topic:api_contract`
+
+Steps:
+1. `scripts/migration_smoke_topic_phase2.py`
+   - verify topic tables exist
+   - CRUD insert/read for `topic_runs` + `topic_posts`
+   - recompute `topic_run_hash` roundtrip
+   - verify unique/check constraints
+2. `scripts/verify_topic_api_contract.py`
+   - verify topic POST create + idempotent canonical hit
+   - verify topic GET shape
+   - verify bad id -> 400 and missing id -> 404
+   - verify provenance headers (`X-Request-ID`, `X-Build-SHA`, `X-Env`)
+
+Result:
+- Topic schema and API contracts become executable merge gates instead of document-only assumptions.

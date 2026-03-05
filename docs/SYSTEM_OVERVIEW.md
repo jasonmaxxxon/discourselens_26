@@ -37,9 +37,9 @@ Pipeline B/C depend on missing modules. The following files are referenced but n
 - `event_crawler.py`
 - `home_crawler.py`
 
-Topic APIs/UI are not wired yet:
-- No production `/api/topics/*` router in backend.
-- No topic run/detail page in frontend.
+Topic frontend surface is not wired yet:
+- Backend has registry skeleton routes: `POST /api/topics/run`, `GET /api/topics/{topic_id}`.
+- No topic run/detail page in frontend yet.
 
 ## Performance Expectations
 - Initial value should be visible within 1–5 seconds via deterministic data (counts, cluster stats, coverage).
