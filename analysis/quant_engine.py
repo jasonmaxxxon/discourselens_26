@@ -14,6 +14,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from analysis.v7.utils.text_preprocess import preprocess_for_embedding, PREPROCESS_VERSION
 logger = logging.getLogger("QuantEngine")
 PERSIST_ASSIGNMENTS = os.getenv("DL_PERSIST_ASSIGNMENTS", "0") == "1"
+ALLOW_DEGRADED_PERSISTENCE = os.getenv("DL_ALLOW_DEGRADED_PERSISTENCE", "1") in {"1", "true", "TRUE"}
 MIN_CLUSTER_SHARE_FOR_NAMING = float(os.getenv("DL_MIN_CLUSTER_SHARE_FOR_NAMING", "0.05"))
 ASSIGNMENT_WRITE_MODE = (os.getenv("DL_ASSIGNMENT_WRITE_MODE") or "fill_nulls").lower()
 
@@ -68,6 +69,10 @@ def _top_keywords(texts: Sequence[str], top_n: int = 6) -> List[str]:
             continue
         found = re.findall(r"[A-Za-z0-9#@']{3,}", t.lower())
         tokens.extend(found)
+        # CJK bigrams for non-Latin content
+        chars = [c for c in t if "\u4e00" <= c <= "\u9fff"]
+        for i in range(len(chars) - 1):
+            tokens.append(chars[i] + chars[i + 1])
     counter = Counter(tokens)
     return [w for w, _ in counter.most_common(top_n)]
 
@@ -449,10 +454,15 @@ def perform_structure_mapping(comments_list: List[Dict[str, Any]], post_id: Opti
             f"assignments_attempted={len(assignments)} assignments_ok={assign_res.get('ok')} skipped_assignments={assign_res.get('skipped')}"
         )
         if not cluster_res.get("ok") or (PERSIST_ASSIGNMENTS and not assign_res.get("ok")):
-            raise RuntimeError(
+            msg = (
                 f"[QuantEngine] Cluster persistence degraded post={post_id} "
                 f"clusters_ok={cluster_res.get('ok')} assignments_ok={assign_res.get('ok')}"
             )
+            persistence["degraded"] = True
+            if ALLOW_DEGRADED_PERSISTENCE:
+                logger.warning(msg)
+            else:
+                raise RuntimeError(msg)
 
     return {
         "node_data": comments_list,

@@ -75,7 +75,7 @@ def _safe_rate(numer: int, denom: int) -> Optional[float]:
 
 async def _fetch_rows(table: str, fields: str, *, since_iso: str, time_field: str, limit: int) -> List[Dict[str, Any]]:
     def _call():
-        return (
+        res = (
             supabase.table(table)
             .select(fields)
             .gte(time_field, since_iso)
@@ -83,9 +83,15 @@ async def _fetch_rows(table: str, fields: str, *, since_iso: str, time_field: st
             .limit(limit)
             .execute()
         )
+        if getattr(res, "error", None):
+            raise RuntimeError(getattr(res.error, "message", str(res.error)))
+        return res
 
-    res = await asyncio.to_thread(_call)
-    return res.data or []
+    try:
+        res = await asyncio.to_thread(_call)
+        return res.data or []
+    except Exception:
+        return []
 
 
 def _compute_job_stats(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -268,14 +274,26 @@ async def get_ops_kpi(range_days: int) -> Dict[str, Any]:
     since = _utcnow() - timedelta(days=range_days)
     since_iso = since.isoformat()
 
-    coverage_rows, behavior_rows, claim_audit_rows, risk_rows, llm_rows, job_rows = await asyncio.gather(
-        _fetch_rows(
+    # Coverage queries sometimes error when captured_at is unavailable in the REST schema.
+    # Fall back to created_at to keep KPI endpoint resilient.
+    try:
+        coverage_rows = await _fetch_rows(
             "threads_coverage_audits",
             "post_id,coverage_ratio,captured_at,created_at",
             since_iso=since_iso,
             time_field="captured_at",
             limit=limit,
-        ),
+        )
+    except Exception:
+        coverage_rows = await _fetch_rows(
+            "threads_coverage_audits",
+            "post_id,coverage_ratio,created_at",
+            since_iso=since_iso,
+            time_field="created_at",
+            limit=limit,
+        )
+
+    behavior_rows, claim_audit_rows, risk_rows, llm_rows, job_rows = await asyncio.gather(
         _fetch_rows(
             "threads_behavior_audits",
             "post_id,created_at",

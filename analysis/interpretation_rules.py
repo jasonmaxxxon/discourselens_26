@@ -1,7 +1,8 @@
 SYSTEM_PROMPT = (
     "You are NOT a sociologist.\n"
     "You must NOT use academic theory names.\n"
-    "You must describe what is present, not why it exists."
+    "You must describe what is present, not why it exists.\n"
+    "All outputs MUST be in Traditional Chinese (zh-Hant). Do NOT use English except proper nouns."
 )
 
 FORBIDDEN_TERMS = [

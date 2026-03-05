@@ -3,6 +3,7 @@ import sys
 import json
 import hashlib
 import logging
+import re
 from typing import Optional, List, Dict, Any
 from datetime import datetime, timezone, date
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -20,7 +21,30 @@ from scraper.image_pipeline import process_images_for_post
 import requests
 from analysis.build_analysis_json import build_and_validate_analysis_json, validate_analysis_json, safe_dump
 from database.integrity import AssignmentIntegrityError, guard_semantic_write
-from analysis.v7.utils.text_preprocess import preprocess_for_embedding
+
+try:
+    import emoji as _emoji
+except Exception:
+    _emoji = None
+
+_WHITESPACE_RE = re.compile(r"\s+")
+
+
+def preprocess_for_embedding(text: Optional[str]) -> str:
+    """
+    Lightweight local fallback to avoid startup hangs from cross-package import.
+    Keeps behavior close to analysis.v7.utils.text_preprocess.
+    """
+    if not text:
+        return ""
+    normalized = text
+    if _emoji is not None:
+        try:
+            normalized = _emoji.demojize(normalized, language="en")
+        except Exception:
+            pass
+    normalized = normalized.replace(":", " ").replace("_", " ")
+    return _WHITESPACE_RE.sub(" ", normalized).strip()
 
 # Safety net: load .env on import so SUPABASE_* exist even if uvicorn misses it.
 load_dotenv()
@@ -192,8 +216,12 @@ def save_analysis_json(
         payload["analysis_is_valid"] = analysis_is_valid
     if analysis_invalid_reason is not None:
         payload["analysis_invalid_reason"] = analysis_invalid_reason
+    elif analysis_is_valid is True:
+        payload["analysis_invalid_reason"] = None
     if analysis_missing_keys is not None:
         payload["analysis_missing_keys"] = analysis_missing_keys
+    elif analysis_is_valid is True:
+        payload["analysis_missing_keys"] = None
 
     supabase.table("threads_posts").update(payload).eq("id", post_id).execute()
 

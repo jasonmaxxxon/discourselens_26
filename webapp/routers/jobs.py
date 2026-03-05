@@ -21,17 +21,17 @@ async def list_jobs(limit: int = 20, response: Response = None):
     manager = JobManager()
     try:
         data, degraded = await manager.get_job_list(limit)
-    except Exception as e:
+    except Exception:
         if response:
             response.headers["x-ops-degraded"] = "1"
             response.headers["Cache-Control"] = "max-age=2"
-        return {"items": [], "degraded": True, "error": str(e)}
+        return []
 
     if degraded and response:
         response.headers["x-ops-degraded"] = "1"
     if response:
         response.headers["Cache-Control"] = "max-age=2"
-    return data
+    return manager.normalize_job_list(data)
 
 
 @router.post("/", response_model=JobStatusResponse)
@@ -43,6 +43,7 @@ async def create_and_run_job(job_in: JobCreate, background_tasks: BackgroundTask
     background_tasks.add_task(_schedule_job, manager, job_id)
 
     job_data = await manager._table_select_single("job_batches", job_id)
+    job_data = manager.normalize_job_batch(job_data)
     job_data["items"], _ = await manager.get_job_items(job_id, limit=20)
     return job_data
 
@@ -53,6 +54,7 @@ async def get_job_status(job_id: str):
     job_data = await manager._table_select_single("job_batches", job_id)
     if not job_data:
         raise HTTPException(status_code=404, detail="Job not found")
+    job_data = manager.normalize_job_batch(job_data)
     job_data["items"], _ = await manager.get_job_items(job_id, limit=20)
     return job_data
 
@@ -94,3 +96,14 @@ async def get_job_summary(job_id: str, response: Response):
         summary["degraded"] = False
     response.headers["Cache-Control"] = "max-age=2"
     return summary
+
+
+@router.post("/{job_id}/cancel", response_model=JobStatusResponse)
+async def cancel_job(job_id: str):
+    manager = JobManager()
+    job_data = await manager.cancel_job(job_id)
+    if not job_data:
+        raise HTTPException(status_code=404, detail="Job not found")
+    job_data = manager.normalize_job_batch(job_data)
+    job_data["items"], _ = await manager.get_job_items(job_id, limit=20)
+    return job_data

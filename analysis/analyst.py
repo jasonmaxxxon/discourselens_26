@@ -959,6 +959,9 @@ text="{post_data.get('post_text')}"
     system_prompt = f"""
 You are DiscourseLens Claims Extractor. {strict_header}
 
+Language:
+- All output MUST be in Traditional Chinese (zh-Hant). Do NOT output English except proper nouns.
+
 Rules:
 1) Output JSON only inside a ```json``` block.
 2) Every claim MUST include evidence_ids (aliases only, e1/e2/..). If you cannot cite, omit that claim.

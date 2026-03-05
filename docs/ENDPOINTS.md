@@ -1,7 +1,16 @@
 # HTTP Endpoints
 
 Base URL: `http://127.0.0.1:8000`
-All JSON endpoints return JSON. Errors use standard HTTP status codes and may include a `detail` field.
+All JSON endpoints return JSON.
+
+Global runtime provenance for every `/api/*` response:
+- `X-Request-ID`: trace id (preserved from inbound header when present, otherwise generated)
+- `X-Build-SHA`: backend build commit hash
+- `X-Env`: runtime environment name
+
+Pending responses include `Retry-After` and payload `{status:"pending", reason, trace_id, ...}`.
+Empty-but-valid responses return HTTP 200 with `{status:"empty", reason:"no_data", trace_id, ...}`.
+Only internal bugs return HTTP 500 and include `{status:"error", trace_id, ...}`.
 
 ## JSON API (`/api/*`)
 
@@ -9,6 +18,37 @@ All JSON endpoints return JSON. Errors use standard HTTP status codes and may in
 Purpose: Ops KPI summary and trend metrics.
 Request: Query param `range` like `7d`, `30d`, `90d`. Default `7d`.
 Response: See `docs/CONTRACTS.md#ops-kpi`.
+
+### GET /api/health
+Purpose: Lightweight readiness probe for backend boot gating.
+Response: `{ "status": "ok" }`
+
+### GET /api/_meta/build
+Purpose: Runtime build identity for drift detection and smoke gates.
+Response:
+```json
+{
+  "status": "ok",
+  "build_sha": "6f13301",
+  "build_time": "2026-02-26T02:17:04.741052Z",
+  "env": "dev",
+  "version": "0.0.0"
+}
+```
+Must never return 500.
+
+### Topic API Status
+Topic Engine V1 contract and schema are provisioned, but production routes are not wired yet.
+- Contract: `docs/TOPIC_CONTRACT_V1.md`
+- Schema migration: `supabase/migrations/20260226150000_topic_engine_phase2_sot.sql`
+- `/api/topics/*`: not available in current backend build
+
+### GET /api/overview/telemetry
+Purpose: Backend-owned Overview telemetry model for Timeline Drift / Comment Momentum cards.
+Request params: `window` in hours text (`24h` default, clamped to `1h..168h`).
+Response: See `docs/CONTRACTS.md#overviewtelemetryresponse`.
+Headers: `x-ops-degraded: 1` on partial data.
+Ownership: Drift and momentum semantics are defined in backend; frontend must render payload directly (no semantic recompute).
 
 ### POST /api/run/batch
 Purpose: Pipeline B backend API (batch). Currently blocked by missing modules.
@@ -46,22 +86,54 @@ Notes: Does not filter on `analysis_is_valid`.
 
 ### GET /api/analysis-json/{post_id}
 Purpose: Primary analysis_json endpoint.
-Response:
-```json
-{
-  "analysis_json": { ... },
-  "analysis_is_valid": true,
-  "analysis_version": "v6.1",
-  "analysis_build_id": "...",
-  "analysis_invalid_reason": null,
-  "analysis_missing_keys": [],
-  "phenomenon": { "id": null, "status": "pending", "case_id": null, "canonical_name": null, "source": "default" }
-}
-```
+Status contract:
+- `200 ready` with `status="ready"`, `trace_id`, and analysis payload.
+- `202 pending` with `status="pending"`, `reason="asset_not_ready"|"upstream_transport"`, `trace_id`, `retry_after_ms`.
+- `404 not_found` with `status="not_found"`, `reason="post_not_found"`, `trace_id`.
+- `500 error` only for internal bugs and includes `status="error"`, `trace_id`.
 
 ### GET /api/analysis/{post_id}
 Purpose: Legacy full_report markdown.
 Response: `{ "post_id": "...", "full_report_markdown": "..." }`
+
+### GET /api/claims
+Purpose: Claims list + latest audit summary for a post.
+Request params: `post_id` (required), `limit` (<=500), `cluster_key`, `status`.
+Status contract:
+- `200 ready|empty`
+- `202 pending` (`reason="asset_not_ready"|"upstream_transport"`)
+- `404 not_found`
+- `500 error` (internal only)
+Response: `{ "status": "...", "trace_id": "...", "claims": [ ... ], "audit": { ... } }`
+
+### GET /api/evidence
+Purpose: Evidence rows for claims (by post or claim).
+Request params: `post_id` or `claim_id` (one required), `cluster_key`, `limit` (<=500).
+Status contract:
+- `200 ready|empty`
+- `202 pending` (`reason="asset_not_ready"|"upstream_transport"`)
+- `404 not_found`
+- `500 error` (internal only)
+Response: `{ "status": "...", "trace_id": "...", "post_id": "...", "items": [ ... ], "claims": [ ... ] }`
+
+### GET /api/clusters
+Purpose: Cluster metadata + samples for a post.
+Request params: `post_id` (required), `limit` (<=60), `sample_limit` (<=12).
+Status contract:
+- `200 ready|empty`
+- `202 pending` (`reason="asset_not_ready"|"upstream_transport"`)
+- `404 not_found`
+- `500 error` (internal only)
+Response: `{ "status": "...", "trace_id": "...", "clusters": [ ... ], "total_comments": 123 }`
+
+### GET /api/clusters/{post_id}/graph
+Purpose: Cluster explorer graph view-model for Insights center canvas.
+Request params: `limit` (<=60).
+Status contract: `200 ready|empty`, `202 pending`, `404 not_found`, `500 error`.
+Response: See `docs/CONTRACTS.md#clustergraphresponse`.
+`status="empty"` with `reason="no_relation_edges_yet"` means nodes exist but no semantic links yet.
+Headers: `x-ops-degraded: 1` when link derivation is partial.
+Ownership: Node/link/coords are backend SoT for graph layout; frontend should not synthesize graph semantics.
 
 ### GET /api/comments/by-post/{post_id}
 Purpose: Comment list for a post.
@@ -73,6 +145,17 @@ Purpose: Search comments.
 Request params: `q`, `author_handle`, `post_id`, `limit` (<=200).
 Response: `{ "items": [ ... ] }`
 
+### POST /api/casebook
+Purpose: Persist immutable deterministic casebook snapshot (Supabase SoT).
+Request body: `{ evidence_id, comment_id, evidence_text, post_id, captured_at, bucket, metrics_snapshot, coverage, summary_version, filters, analyst_note? }`.
+Response: `{ "status": "recorded", "id": "...", "created_at": "..." }`
+
+### GET /api/casebook
+Purpose: List casebook snapshots for export/review.
+Request params: `post_id` (optional), `limit` (<=500).
+Response: `{ "items": [ ... ] }`
+Headers: `x-ops-degraded: 1` when DB snapshot list is temporarily unavailable (response falls back to empty list).
+
 ### GET /api/library/phenomena
 Purpose: Phenomenon registry lookup (currently disabled in pipeline).
 Request params: `status`, `q`, `limit` (<=500).
@@ -80,7 +163,15 @@ Response: Array of registry items.
 
 ### GET /api/library/phenomena/{phenomenon_id}
 Purpose: Phenomenon detail + related posts.
-Response: `{ "meta": {...}, "stats": {...}, "recent_posts": [...] }`
+Status contract: `200 ready|empty`, `202 pending`, `404 not_found`, `500 error`.
+Response: `{ "status": "...", "trace_id": "...", "meta": {...}, "stats": {...}, "recent_posts": [...] }`
+
+### GET /api/library/phenomena/{phenomenon_id}/signals
+Purpose: Backend semantic aggregation for library occurrence timeline + related signals.
+Request params: `window` in hours text (`24h` default, clamped to `1h..168h`).
+Response: See `docs/CONTRACTS.md#phenomenonsignalsresponse`.
+Headers: `x-ops-degraded: 1` on partial aggregation.
+Ownership: Replaces frontend `/api/claims + /api/evidence` signal assembly. Sorting/strength semantics are backend-owned.
 
 ### POST /api/library/phenomena/{phenomenon_id}/promote
 Purpose: Promote a phenomenon from `provisional` to `active`.
@@ -131,6 +222,13 @@ Headers: `x-ops-degraded` may be set to `1` if data is stale.
 ### GET /api/jobs/{job_id}/summary
 Purpose: Aggregated counters and heartbeat.
 Response: `{ job_id, status, total_count, processed_count, success_count, failed_count, last_item_updated_at, last_heartbeat_at, degraded }`.
+
+### POST /api/jobs/{job_id}/cancel
+Purpose: Operator cancel for an in-flight/queued run.
+Response: JobStatusResponse (status will become `canceled` when accepted).
+Notes:
+- Best-effort cancel. Current worker stops claiming new items once batch status is `canceled`.
+- Pending/processing `job_items` are marked `canceled`.
 
 ## HTML Console (Jinja)
 

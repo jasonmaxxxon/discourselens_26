@@ -1,6 +1,7 @@
 import hashlib
 import json
 import os
+import time
 from datetime import datetime, timezone
 from typing import Any, Dict, Iterable, List
 
@@ -15,6 +16,16 @@ def _read_json(path: str) -> Any:
 def _chunk(items: List[Dict[str, Any]], size: int = 200) -> Iterable[List[Dict[str, Any]]]:
     for idx in range(0, len(items), size):
         yield items[idx : idx + size]
+
+
+def _execute_with_retry(call, *, label: str, retries: int = 3, base_sleep: float = 0.4):
+    for attempt in range(retries):
+        try:
+            return call()
+        except Exception:
+            if attempt >= retries - 1:
+                raise
+            time.sleep(base_sleep * (2 ** attempt))
 
 
 def ingest_run(run_dir: str) -> Dict[str, Any]:
@@ -53,14 +64,22 @@ def ingest_run(run_dir: str) -> Dict[str, Any]:
         "raw_html_final_path": posts_raw.get("raw_html_final_path"),
         "raw_cards_path": posts_raw.get("raw_cards_path"),
     }
-    supabase.table("threads_posts_raw").upsert(raw_payload, on_conflict="run_id,post_id").execute()
+    _execute_with_retry(
+        lambda: supabase.table("threads_posts_raw").upsert(raw_payload, on_conflict="run_id,post_id").execute(),
+        label="threads_posts_raw",
+    )
 
     captured_at = crawled_at_utc or datetime.now(timezone.utc).isoformat()
-    supabase.table("threads_posts").upsert(
-        {"url": post_url, "captured_at": captured_at},
-        on_conflict="url",
-    ).execute()
-    res = supabase.table("threads_posts").select("id").eq("url", post_url).limit(1).execute()
+    _execute_with_retry(
+        lambda: supabase.table("threads_posts")
+        .upsert({"url": post_url, "captured_at": captured_at}, on_conflict="url")
+        .execute(),
+        label="threads_posts",
+    )
+    res = _execute_with_retry(
+        lambda: supabase.table("threads_posts").select("id").eq("url", post_url).limit(1).execute(),
+        label="threads_posts_select",
+    )
     if not res.data:
         raise RuntimeError(f"threads_posts upsert ok but cannot re-select id for url={post_url}")
     post_row_id = res.data[0]["id"]
@@ -147,7 +166,10 @@ def ingest_run(run_dir: str) -> Dict[str, Any]:
         post_update["reply_count"] = len(comments)
     if post_update:
         post_update["updated_at"] = datetime.now(timezone.utc).isoformat()
-        supabase.table("threads_posts").update(post_update).eq("id", post_row_id).execute()
+        _execute_with_retry(
+            lambda: supabase.table("threads_posts").update(post_update).eq("id", post_row_id).execute(),
+            label="threads_posts_update",
+        )
 
     comment_rows: List[Dict[str, Any]] = []
     metrics_quality = {"exact": 0, "partial": 0, "missing": 0}
@@ -191,8 +213,11 @@ def ingest_run(run_dir: str) -> Dict[str, Any]:
             }
         )
 
-    for chunk in _chunk(comment_rows, 200):
-        supabase.table("threads_comments").upsert(chunk, on_conflict="id").execute()
+    for chunk in _chunk(comment_rows, 120):
+        _execute_with_retry(
+            lambda chunk=chunk: supabase.table("threads_comments").upsert(chunk, on_conflict="id").execute(),
+            label="threads_comments_upsert",
+        )
 
     edges = _read_json(edges_path) or []
     edge_rows: List[Dict[str, Any]] = []
@@ -211,11 +236,13 @@ def ingest_run(run_dir: str) -> Dict[str, Any]:
             }
         )
 
-    for chunk in _chunk(edge_rows, 300):
-        supabase.table("threads_comment_edges").upsert(
-            chunk,
-            on_conflict="post_id,parent_comment_id,child_comment_id,edge_type",
-        ).execute()
+    for chunk in _chunk(edge_rows, 200):
+        _execute_with_retry(
+            lambda chunk=chunk: supabase.table("threads_comment_edges")
+            .upsert(chunk, on_conflict="post_id,parent_comment_id,child_comment_id,edge_type")
+            .execute(),
+            label="threads_comment_edges_upsert",
+        )
 
     return {
         "run_id": run_id,

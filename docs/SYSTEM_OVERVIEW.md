@@ -9,6 +9,9 @@ DiscourseLens ingests Threads posts, builds a deterministic preanalysis layer, g
 - Claims-only LLM path is active.
 - Behavior side-channel + risk brief is active.
 - Ops KPI + job tracking is active.
+- Stitch UI primary routes are active (`/overview`, `/pipeline`, `/insights`, `/library`, `/review`) and remain post-centric.
+- Topic Contract v1 + Phase-2 Topic SoT tables are provisioned.
+- Week-1 deterministic decision UI is active (`Detect`, `Investigate`, `Compare`) using existing APIs and deep-link filters.
 
 ## Explicitly Disabled
 - Phenomenon enrichment is hard‑disabled by `DL_ENABLE_PHENOMENON_ENRICHMENT=false`.
@@ -34,6 +37,10 @@ Pipeline B/C depend on missing modules. The following files are referenced but n
 - `event_crawler.py`
 - `home_crawler.py`
 
+Topic APIs/UI are not wired yet:
+- No production `/api/topics/*` router in backend.
+- No topic run/detail page in frontend.
+
 ## Performance Expectations
 - Initial value should be visible within 1–5 seconds via deterministic data (counts, cluster stats, coverage).
 - LLM claims may take longer; Ops KPI captures latency and failure rates.
@@ -42,3 +49,5 @@ Pipeline B/C depend on missing modules. The following files are referenced but n
 - Reduce Time‑to‑First‑Value by surfacing preanalysis results early.
 - Keep LLM calls minimal and audited; track token usage in `llm_call_logs`.
 - Improve coverage ratio by tuning fetcher budgets and plateau detection.
+- Track and expose crawl freshness lag (`freshness_lag_seconds`) as an explicit ops signal for topic/lifecycle trust.
+- Keep decision surfaces deterministic-first with explicit low-sample warnings before any model-derived labeling is exposed.

@@ -242,6 +242,7 @@ def _build_prompt(
             "forbidden_terms": FORBIDDEN_TERMS,
             "forbidden_causal": FORBIDDEN_CAUSAL,
             "min_evidence_ids": 2,
+            "language": "Traditional Chinese (zh-Hant). No English except proper nouns.",
         },
     }
 

@@ -73,6 +73,18 @@ def _sanitize_text(text: str) -> str:
     return text.strip()
 
 
+def _has_cjk(text: str, min_chars: int = 2) -> bool:
+    if not text:
+        return False
+    count = 0
+    for ch in text:
+        if "\u4e00" <= ch <= "\u9fff":
+            count += 1
+            if count >= min_chars:
+                return True
+    return False
+
+
 def _cap_text(text: str, limit: int = MAX_RAW_LEN) -> str:
     if not isinstance(text, str):
         return ""
@@ -183,6 +195,10 @@ def _validate_label_payload(payload: Dict[str, Any], allowed_ids: List[str], req
     evidence_ids = payload.get("evidence_ids") or []
     if not label or not one_liner:
         errors.append("missing_label_or_one_liner")
+    if label and not _has_cjk(label):
+        errors.append("label_not_traditional_chinese")
+    if one_liner and not _has_cjk(one_liner):
+        errors.append("one_liner_not_traditional_chinese")
     if label_style.lower() != "descriptive":
         errors.append("label_style_not_descriptive")
     if _contains_forbidden(label) or _contains_forbidden(one_liner):

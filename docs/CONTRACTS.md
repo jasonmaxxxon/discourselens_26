@@ -2,6 +2,48 @@
 
 This file documents the JSON payloads produced or consumed by the system. It is intended to let new engineers reason about the pipeline without reading code.
 
+## Topic Contract V1
+Topic/Case deterministic run contracts (input shape, canonical hashes, lifecycle/managed score rules) are defined in:
+- `docs/TOPIC_CONTRACT_V1.md`
+
+Current status:
+- Topic schema tables are provisioned.
+- Public `/api/topics/*` contracts are not wired in backend routes yet.
+
+## Runtime Provenance Headers
+Every `/api/*` response includes:
+- `X-Request-ID`: request trace id (preserved from inbound if provided).
+- `X-Build-SHA`: backend build SHA.
+- `X-Env`: runtime environment (`dev|staging|prod`).
+
+## ApiEnvelope (Common Status Semantics)
+```json
+{
+  "status": "ready|pending|empty|not_found|error",
+  "reason": "optional_reason_code_or_null",
+  "reason_code": "optional_reason_code_or_null",
+  "trace_id": "<x-request-id>",
+  "detail": "optional human-safe message"
+}
+```
+Rules:
+- `202 pending`: transient transport or asset-not-ready states; includes `retry_after_ms`.
+- `200 empty`: valid empty data; never fake/demo fallback.
+- `404 not_found`: requested resource id absent.
+- `500 error`: internal bug only; must include `trace_id`.
+
+## BuildMetaResponse
+Returned by `/api/_meta/build`.
+```json
+{
+  "status": "ok",
+  "build_sha": "6f13301",
+  "build_time": "2026-02-26T02:17:04.741052Z",
+  "env": "dev",
+  "version": "0.0.0"
+}
+```
+
 ## Pipeline B Batch Request
 ```json
 {
@@ -34,7 +76,7 @@ Notes: Pipeline B requires missing modules in this repo, so it is currently non-
 ```json
 {
   "id": "<uuid>",
-  "status": "pending|discovering|processing|completed|failed|cancelled",
+  "status": "pending|discovering|processing|completed|failed|canceled|stale",
   "pipeline_type": "A|B|C",
   "mode": "ingest|analyze|full",
   "total_count": 0,
@@ -55,8 +97,8 @@ Notes: Pipeline B requires missing modules in this repo, so it is currently non-
 {
   "id": "<uuid>",
   "target_id": "https://www.threads.net/@.../post/...",
-  "status": "pending|processing|completed|failed",
-  "stage": "init|fetch|analyst|store|completed|failed",
+  "status": "pending|processing|completed|failed|canceled",
+  "stage": "init|fetch|analyst|store|completed|failed|canceled",
   "result_post_id": "12345",
   "error_log": null,
   "updated_at": "2026-02-10T00:00:00Z"
@@ -101,6 +143,11 @@ Notes: Pipeline B requires missing modules in this repo, so it is currently non-
 ## Analysis JSON Response
 ```json
 {
+  "status": "ready|pending|not_found|error",
+  "reason": null,
+  "reason_code": null,
+  "trace_id": "<x-request-id>",
+  "post_id": "440",
   "analysis_json": { ... },
   "analysis_is_valid": true,
   "analysis_version": "v6.1",
@@ -110,6 +157,197 @@ Notes: Pipeline B requires missing modules in this repo, so it is currently non-
   "phenomenon": { "id": null, "status": "pending", "case_id": null, "canonical_name": null, "source": "default" }
 }
 ```
+
+## OverviewTelemetryResponse
+Returned by `/api/overview/telemetry`.
+```json
+{
+  "window": "24h",
+  "drift_buckets": [
+    {
+      "ts_hour": "2026-02-24T02:00:00Z",
+      "drift_score": 12.5,
+      "baseline": 8.2,
+      "sample_n": 14
+    }
+  ],
+  "momentum_events": [
+    {
+      "ts": "2026-02-24T02:12:00Z",
+      "level": "info",
+      "actor": "job-worker",
+      "action": "ingest · processing",
+      "ref_type": "job_item",
+      "ref_id": "..."
+    }
+  ],
+  "active_context": {
+    "job_id": "...",
+    "post_id": "...",
+    "phenomenon_id": "..."
+  },
+  "meta": {
+    "generated_at": "2026-02-24T02:13:00Z",
+    "degraded": false,
+    "source": ["job_batches", "job_items", "threads_posts"]
+  }
+}
+```
+Notes:
+- `drift_score` is backend deterministic proxy (currently based on behavior quality missing timestamp ratio).
+- Frontend must not infer drift semantics independently.
+
+## ClaimsResponse
+Returned by `/api/claims`.
+```json
+{
+  "status": "ready|empty|pending|not_found|error",
+  "reason": null,
+  "reason_code": null,
+  "trace_id": "<x-request-id>",
+  "post_id": "440",
+  "claims": [],
+  "audit": null
+}
+```
+
+## EvidenceResponse
+Returned by `/api/evidence`.
+```json
+{
+  "status": "ready|empty|pending|not_found|error",
+  "reason": null,
+  "reason_code": null,
+  "trace_id": "<x-request-id>",
+  "post_id": "440",
+  "items": [],
+  "claims": []
+}
+```
+
+## ClusterListResponse
+Returned by `/api/clusters`.
+```json
+{
+  "status": "ready|empty|pending|not_found|error",
+  "reason": null,
+  "reason_code": null,
+  "trace_id": "<x-request-id>",
+  "post_id": "440",
+  "clusters": [],
+  "total_comments": 0,
+  "engagement_truncated": false,
+  "degraded": false
+}
+```
+
+## ClusterGraphResponse
+Returned by `/api/clusters/{post_id}/graph`.
+```json
+{
+  "status": "ready|empty|pending|not_found|error",
+  "reason": null,
+  "reason_code": null,
+  "trace_id": "<x-request-id>",
+  "post_id": "440",
+  "nodes": [
+    {
+      "id": "c-1",
+      "cluster_key": 1,
+      "weight": 47,
+      "label": "關於外傭工作表現不佳的幽默討論",
+      "share": 0.57,
+      "coords": { "x": 0.22, "y": 0.78 },
+      "metrics": { "likes": 19019, "replies": 155 },
+      "cip": { "run_id": "...", "label_confidence": 0.85, "label_unstable": true }
+    }
+  ],
+  "links": [
+    { "source": "c-1", "target": "c-3", "weight": 4, "type": "claim_coupling" }
+  ],
+  "coords": [
+    { "id": "c-1", "x": 0.22, "y": 0.78 }
+  ],
+  "meta": {
+    "run_id": "...",
+    "generated_at": "2026-02-24T02:13:00Z",
+    "layout_version": "v1",
+    "degraded": false,
+    "source": ["threads_comment_clusters", "threads_claims"]
+  }
+}
+```
+Notes:
+- `nodes/links/coords` form the explorer SoT; UI should render directly and emit only interaction events.
+
+## PhenomenonDetailResponse
+Returned by `/api/library/phenomena/{phenomenon_id}`.
+```json
+{
+  "status": "ready|empty|pending|not_found|error",
+  "reason": null,
+  "reason_code": null,
+  "trace_id": "<x-request-id>",
+  "phenomenon_id": "34aa6d22-df89-4beb-9414-c5b21d2f11aa",
+  "meta": {
+    "id": "34aa6d22-df89-4beb-9414-c5b21d2f11aa",
+    "canonical_name": "Screenshot_Justice",
+    "description": "optional",
+    "status": "active"
+  },
+  "stats": {
+    "total_posts": 3,
+    "total_likes": 188,
+    "last_seen_at": "2026-02-24T02:13:00Z"
+  },
+  "recent_posts": []
+}
+```
+
+## PhenomenonSignalsResponse
+Returned by `/api/library/phenomena/{phenomenon_id}/signals`.
+```json
+{
+  "status": "ready|empty|pending|not_found|error",
+  "reason": null,
+  "reason_code": null,
+  "trace_id": "<x-request-id>",
+  "phenomenon_id": "34aa6d22-df89-4beb-9414-c5b21d2f11aa",
+  "window": "24h",
+  "occurrence_timeline": [
+    {
+      "ts_hour": "2026-02-24T02:00:00Z",
+      "post_count": 1,
+      "comment_count": 13,
+      "risk_max": 0.44
+    }
+  ],
+  "related_signals": [
+    {
+      "signal_id": "sig-a1b2c3d4",
+      "title": "Signal title",
+      "strength_pct": 72,
+      "source_type": "claim",
+      "source_ref": "a1b2c3d4...",
+      "evidence_count": 3,
+      "last_seen": "2026-02-24T02:12:00Z"
+    }
+  ],
+  "supporting_refs": {
+    "latest_post_id": "440",
+    "latest_run_id": "..."
+  },
+  "meta": {
+    "computed_at": "2026-02-24T02:13:00Z",
+    "version": "v0",
+    "degraded": false
+  }
+}
+```
+Notes:
+- Related signals are backend semantic aggregation (claims + evidence) with deterministic order:
+  `strength_pct DESC`, then `evidence_count DESC`, then `last_seen DESC`.
+- Frontend should not re-assemble signals from raw claims/evidence APIs.
 
 ## Analysis JSON (Shape)
 `analysis_json` follows the AnalysisV4 schema with compatibility fields:
@@ -275,6 +513,89 @@ Claims are library-first and audited before persistence.
   "meta": { "prompt_hash": "...", "model_name": "...", "audit_verdict": "pass|fail|partial" }
 }
 ```
+
+## Comments By Post Response
+Returned by `/api/comments/by-post/{post_id}`.
+```json
+{
+  "post_id": "123",
+  "total": 482,
+  "items": [
+    {
+      "id": "cmt_1",
+      "text": "...",
+      "author_handle": "@user",
+      "like_count": 12,
+      "reply_count": 3,
+      "cluster_key": 4,
+      "created_at": "2026-02-10T00:00:00Z"
+    }
+  ]
+}
+```
+
+## Comments Search Response
+Returned by `/api/comments/search`.
+```json
+{
+  "items": [
+    {
+      "id": "cmt_1",
+      "post_id": "123",
+      "text": "...",
+      "author_handle": "@user",
+      "like_count": 12,
+      "reply_count": 3,
+      "cluster_key": 4,
+      "created_at": "2026-02-10T00:00:00Z"
+    }
+  ]
+}
+```
+
+## Casebook Snapshot (Immutable)
+Written by `/api/casebook` and read by `/api/casebook`.
+```json
+{
+  "id": "uuid",
+  "evidence_id": "cmt_1",
+  "comment_id": "cmt_1",
+  "evidence_text": "comment text",
+  "post_id": "123",
+  "captured_at": "2026-02-23T02:00:00Z",
+  "bucket": {
+    "t0": "2026-02-23T01:20:00Z",
+    "t1": "2026-02-23T01:35:00Z"
+  },
+  "metrics_snapshot": {
+    "bucket_comment_count": 42,
+    "prev_bucket_comment_count": 15,
+    "momentum_pct": 180.0,
+    "dominant_cluster_id": 4,
+    "dominant_cluster_share": 61.9
+  },
+  "coverage": {
+    "comments_loaded": 300,
+    "comments_total": 5234,
+    "is_truncated": true
+  },
+  "summary_version": "casebook_summary_v1",
+  "filters": {
+    "author": "@analyst",
+    "cluster_key": 4,
+    "query": "shipping delay",
+    "sort": "time_desc"
+  },
+  "analyst_note": null,
+  "created_at": "2026-02-23T02:00:01Z"
+}
+```
+Rules:
+- `summary_version` is required (`casebook_summary_v1`) and immutable.
+- `coverage.is_truncated` must equal `(comments_total > comments_loaded)` when `comments_total` is known.
+- Snapshot fields (`bucket`, `metrics_snapshot`, `coverage`, `summary_version`, `filters`) are immutable once written.
+- Only `analyst_note` is mutable after insertion.
+- Export uses stored snapshot fields directly (no recomputation).
 
 ## Ops KPI
 Returned by `/api/ops/kpi`.

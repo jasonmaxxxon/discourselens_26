@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+python-dotenv>=1.0.0
+supabase
+requests
+pandas
+numpy
+plotly
+emoji
+beautifulsoup4
+playwright==1.57.0
+httpx
+httpcore
+jinja2
+python-multipart
