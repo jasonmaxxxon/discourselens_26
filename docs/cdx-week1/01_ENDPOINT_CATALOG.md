@@ -30,6 +30,34 @@ Headers (required):
 - `X-Build-SHA`
 - `X-Env`
 
+## Topic Worker Endpoint (CDX-TOPIC-WORKER-001)
+
+### POST /api/topics/worker/run-once
+Purpose: Claim one topic run with lease lock and compute deterministic snapshot stats.
+
+Request:
+```json
+{
+  "lock_owner": "api-topic-worker",
+  "lease_seconds": 600,
+  "topic_id": "optional uuid",
+  "force_recompute": false
+}
+```
+
+Response:
+- `200` + `status="ready"` when one run is processed
+- `200` + `status="empty"` when no claimable run exists
+- `200` + `status="failed"` when worker processing fails for claimed run
+- `404` + `status="not_found"` when `topic_id` not found
+- `400` + `reason_code="validation_error"` for invalid input
+- Never returns `500`
+
+Headers (required):
+- `X-Request-ID`
+- `X-Build-SHA`
+- `X-Env`
+
 ### GET /api/topics/{topic_id}
 Purpose: Read topic run registry details and posts preview.
 

@@ -19,6 +19,9 @@ source .venv/bin/activate
 pip install -r requirements.txt
 uvicorn webapp.main:app --reload --port 8000
 ```
+Notes:
+- Dev runtime baseline uses backend `8000` and frontend `5173`.
+- Keep a single backend instance to avoid contract gates pointing to stale builds.
 
 **Frontend**
 ```bash
@@ -47,6 +50,7 @@ python3 scripts/run_preanalysis.py --post-id 410 --prefer-sot --persist-assignme
 PYTHONPATH=. python3 scripts/verify_topic_contract_golden.py
 make topic:migration_smoke
 make topic:api_contract
+make topic:worker_smoke
 ```
 
 **Ops UI**

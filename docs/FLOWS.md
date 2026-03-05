@@ -249,3 +249,33 @@ Steps:
 
 Result:
 - Topic schema and API contracts become executable merge gates instead of document-only assumptions.
+
+## Flow 12: Topic Worker Skeleton (Phase-3.5)
+Trigger:
+- `POST /api/topics/worker/run-once`
+- `make topic:worker_smoke`
+
+Steps:
+1. Worker claims one run from `topic_runs` with lease lock:
+   - prefer `status='pending'`
+   - reclaim stale `status='running'` when heartbeat lease expires
+2. Worker transitions run:
+   - `pending -> running -> completed|failed`
+3. Worker computes deterministic snapshot stats from `topic_posts` + `threads_posts`:
+   - `post_count`
+   - `first_post_time`
+   - `last_post_time`
+   - `comment_count_total`
+   - `engagement_sum`
+4. Worker writes `topic_runs.stats_json` by deterministic overwrite (no incremental accumulation).
+5. On failure, worker marks run `failed` with error summary, still in JSON envelope (non-500).
+
+Writes:
+- `topic_runs.status`
+- `topic_runs.lock_owner`, `locked_at`, `heartbeat_at`, `lock_lease_seconds`, `attempt_count`
+- `topic_runs.stats_json`
+- `topic_runs.started_at`, `finished_at`, `updated_at`
+
+Result:
+- Topic registry becomes executable pipeline skeleton with re-entrant deterministic compute.
+- Stuck running jobs become recoverable via lease reclaim.

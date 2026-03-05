@@ -16,7 +16,7 @@ import math
 import json as _json
 import numpy as np
 
-from webapp.services import topic_store
+from webapp.services import topic_store, topic_worker
 
 router = APIRouter()
 
@@ -173,8 +173,10 @@ def _classify_exception(exc: Exception) -> Dict[str, Any]:
         'server disconnected',
         'econnreset',
         'pgrst205',
+        '42703',
         'schema cache',
         'could not find the table',
+        'does not exist',
     )
     if any(token in msg for token in transport_tokens) or 'timeout' in name.lower() or 'httpx' in name.lower():
         return {'kind': 'UPSTREAM_TRANSPORT', 'retriable': True, 'message_safe': 'Upstream transport error'}
@@ -833,6 +835,13 @@ class TopicRunCreateRequest(BaseModel):
     run_params: Optional[Dict[str, Any]] = None
     source: Optional[str] = "manual"
     created_by: Optional[str] = None
+
+
+class TopicWorkerRunRequest(BaseModel):
+    lock_owner: Optional[str] = None
+    lease_seconds: int = 600
+    topic_id: Optional[str] = None
+    force_recompute: bool = False
 
 
 class AcademicReference(BaseModel):
@@ -3017,6 +3026,76 @@ def get_topic_run_registry(topic_id: str, response: Response, request: Request, 
             pending_detail="Topic detail temporarily unavailable.",
             extra={
                 "topic_id": str(topic_id),
+            },
+        )
+
+
+@router.post("/topics/worker/run-once")
+def run_topic_worker_once(payload: TopicWorkerRunRequest, response: Response, request: Request):
+    trace_id = _trace_id_from_request(request)
+    _attach_trace_id(response, trace_id)
+
+    try:
+        lease_seconds = int(payload.lease_seconds or 600)
+        if lease_seconds < 1 or lease_seconds > 86400:
+            raise ValueError("lease_seconds must be in [1, 86400]")
+
+        topic_id: Optional[str] = None
+        if payload.topic_id:
+            topic_id = str(uuid.UUID(str(payload.topic_id).strip()))
+
+        lock_owner = str(payload.lock_owner or f"api-topic-worker:{trace_id[:8]}").strip()
+        if not lock_owner:
+            lock_owner = f"api-topic-worker:{trace_id[:8]}"
+        lock_owner = lock_owner[:120]
+
+        result = topic_worker.run_topic_worker_once(
+            runner.supabase,
+            lock_owner=lock_owner,
+            lease_seconds=lease_seconds,
+            topic_run_id=topic_id,
+            force_recompute=bool(payload.force_recompute),
+        )
+
+        status = str(result.get("status") or "").strip().lower()
+        reason_code = str(result.get("reason_code") or "").strip() or None
+        out: Dict[str, Any] = {
+            "status": status or "pending",
+            "reason": reason_code,
+            "reason_code": reason_code,
+            "trace_id": trace_id,
+            "worker": {
+                "lock_owner": lock_owner,
+                "lease_seconds": lease_seconds,
+                "force_recompute": bool(payload.force_recompute),
+            },
+        }
+        out.update({k: v for k, v in result.items() if k not in {"reason", "trace_id"}})
+
+        if status == "not_found":
+            return _json_with_trace(out, status_code=404, trace_id=trace_id)
+        if status == "failed":
+            # Worker failure is still deterministic JSON result, not HTTP 500.
+            return _json_with_trace(out, status_code=200, trace_id=trace_id)
+        return _json_with_trace(out, status_code=200, trace_id=trace_id)
+    except Exception as exc:
+        kind = _classify_exception(exc).get("kind")
+        if kind in {"VALIDATION_ERROR", "UPSTREAM_TRANSPORT"}:
+            runner.logger.info("api/topics/worker/run-once handled failure kind=%s err=%s", kind, exc)
+        else:
+            runner.logger.exception("api/topics/worker/run-once failed")
+        return _topic_response_for_exception(
+            exc=exc,
+            response=response,
+            trace_id=trace_id,
+            pending_reason="topic_worker_pending",
+            pending_detail="Topic worker temporarily unavailable.",
+            extra={
+                "worker": {
+                    "lock_owner": str(payload.lock_owner or ""),
+                    "lease_seconds": int(payload.lease_seconds or 600),
+                    "force_recompute": bool(payload.force_recompute),
+                }
             },
         )
 

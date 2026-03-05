@@ -73,6 +73,30 @@ Notes:
 - Schema SoT: `supabase/migrations/20260226150000_topic_engine_phase2_sot.sql`
 - Current phase only covers registry; no cross-post compute/materialization in these endpoints.
 
+### POST /api/topics/worker/run-once
+Purpose: Run Topic worker once (Phase-3.5 skeleton) with claim/lease lock and deterministic snapshot stats writeback.
+Request body:
+```json
+{
+  "lock_owner": "api-topic-worker",
+  "lease_seconds": 600,
+  "topic_id": "optional-uuid",
+  "force_recompute": false
+}
+```
+Response:
+- `200 ready` when one run is processed to `completed`.
+- `200 empty` when no claimable run exists (`no_accepted_topic_runs`, `topic_locked`, etc.).
+- `404 not_found` when `topic_id` does not exist.
+- `400 validation_error` for invalid `topic_id` or invalid lease range.
+- `200 failed` when worker execution fails for claimed run (deterministic non-500 envelope).
+Never returns `500`.
+
+Behavior:
+- Status machine: `pending(accepted)` -> `running` -> `completed(ready)|failed`
+- Lock safety: lease reclaim from stale `running` rows (`heartbeat_at` timeout)
+- Writeback: `topic_runs.stats_json` is deterministic overwrite (re-entrant/idempotent)
+
 ### GET /api/overview/telemetry
 Purpose: Backend-owned Overview telemetry model for Timeline Drift / Comment Momentum cards.
 Request params: `window` in hours text (`24h` default, clamped to `1h..168h`).

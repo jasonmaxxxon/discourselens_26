@@ -9,6 +9,7 @@ Topic/Case deterministic run contracts (input shape, canonical hashes, lifecycle
 Current status:
 - Topic schema tables are provisioned.
 - Public `/api/topics/run` and `/api/topics/{topic_id}` registry routes are wired (Phase-3 skeleton).
+- Topic worker skeleton route is wired: `/api/topics/worker/run-once` (Phase-3.5).
 - Meta-cluster/lifecycle compute is still pending worker materialization.
 
 ## Runtime Provenance Headers
@@ -122,6 +123,48 @@ Status contract:
 - missing id -> `404 not_found`
 - backend unavailable -> `200 pending`
 - never `500`
+
+## TopicWorkerRunOnceRequest (Phase-3.5 skeleton)
+Returned by `POST /api/topics/worker/run-once` request body.
+```json
+{
+  "lock_owner": "api-topic-worker",
+  "lease_seconds": 600,
+  "topic_id": "optional uuid",
+  "force_recompute": false
+}
+```
+
+## TopicWorkerRunOnceResponse (Phase-3.5 skeleton)
+Returned by `POST /api/topics/worker/run-once`.
+```json
+{
+  "status": "ready|empty|failed|not_found|error|pending",
+  "reason": "reason_code_or_null",
+  "reason_code": "reason_code_or_null",
+  "trace_id": "<x-request-id>",
+  "topic_id": "uuid",
+  "topic_run_hash": "sha256",
+  "stats_json": {
+    "worker_version": "topic_worker_v1",
+    "post_count": 3,
+    "first_post_time": "iso8601|null",
+    "last_post_time": "iso8601|null",
+    "comment_count_total": 42,
+    "engagement_sum": 1337
+  },
+  "worker": {
+    "lock_owner": "api-topic-worker",
+    "lease_seconds": 600,
+    "force_recompute": false
+  }
+}
+```
+Rules:
+- Worker never mutates stats via incremental `+=`; always deterministic overwrite.
+- `force_recompute=true` allows re-entrant recompute for idempotence checks.
+- `running` lease is reclaimable when heartbeat timeout is exceeded.
+- endpoint never returns `500`.
 
 ## Pipeline B Batch Request
 ```json

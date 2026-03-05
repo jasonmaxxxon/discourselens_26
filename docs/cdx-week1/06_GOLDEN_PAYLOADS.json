@@ -76,5 +76,45 @@
       "trace_id": "request-id",
       "topic_id": "not-a-uuid"
     }
+  },
+  "topic_worker": {
+    "run_once_request": {
+      "lock_owner": "api-topic-worker",
+      "lease_seconds": 600,
+      "topic_id": "uuid",
+      "force_recompute": false
+    },
+    "run_once_response_ready": {
+      "status": "ready",
+      "reason": "topic_run_ready",
+      "reason_code": "topic_run_ready",
+      "trace_id": "request-id",
+      "topic_id": "uuid",
+      "topic_run_hash": "sha256",
+      "stats_json": {
+        "worker_version": "topic_worker_v1",
+        "post_count": 3,
+        "first_post_time": "2026-02-01T00:00:00Z",
+        "last_post_time": "2026-02-07T00:00:00Z",
+        "comment_count_total": 42,
+        "engagement_sum": 1337
+      },
+      "worker": {
+        "lock_owner": "api-topic-worker",
+        "lease_seconds": 600,
+        "force_recompute": false
+      }
+    },
+    "run_once_response_empty": {
+      "status": "empty",
+      "reason": "no_accepted_topic_runs",
+      "reason_code": "no_accepted_topic_runs",
+      "trace_id": "request-id",
+      "worker": {
+        "lock_owner": "api-topic-worker",
+        "lease_seconds": 600,
+        "force_recompute": false
+      }
+    }
   }
 }

@@ -136,6 +136,12 @@ For full DDL, read the SQL files themselves.
   - create indexes: topic run/meta/lifecycle query paths
   - add FK: topic_lifecycle_daily(topic_run_id, meta_cluster_key) -> topic_meta_clusters
 
+- `supabase/migrations/20260305163000_topic_worker_locking.sql`
+  - alter table: public.topic_runs
+  - add columns: lock_owner, locked_at, heartbeat_at, lock_lease_seconds, attempt_count
+  - add check: topic_runs_lock_lease_seconds_ck
+  - add indexes: status+updated, running+heartbeat
+
 ## Topic Merge Gates (Phase-3)
 
 - `make topic:migration_smoke`
@@ -145,3 +151,7 @@ For full DDL, read the SQL files themselves.
 - `make topic:api_contract`
   - runs `scripts/verify_topic_api_contract.py`
   - validates Topic API registry contract (`POST /api/topics/run`, `GET /api/topics/{id}`) and provenance headers
+
+- `make topic:worker_smoke`
+  - runs `scripts/verify_topic_worker_smoke.py`
+  - validates worker status transitions, lock/lease behavior, deterministic stats overwrite, and never-500 envelope

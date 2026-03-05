@@ -468,7 +468,7 @@ Columns:
 ## public.topic_runs
 Immutable topic snapshot runs (Phase-2 provisioned).
 
-_Sources: supabase/migrations/20260226150000_topic_engine_phase2_sot.sql_
+_Sources: supabase/migrations/20260226150000_topic_engine_phase2_sot.sql, supabase/migrations/20260305163000_topic_worker_locking.sql_
 
 Columns:
 - `id`: uuid primary key default gen_random_uuid()
@@ -491,6 +491,11 @@ Columns:
 - `started_at`: timestamptz
 - `finished_at`: timestamptz
 - `updated_at`: timestamptz not null default now()
+- `lock_owner`: text
+- `locked_at`: timestamptz
+- `heartbeat_at`: timestamptz
+- `lock_lease_seconds`: int not null default 600
+- `attempt_count`: int not null default 0
 
 ## public.topic_posts
 Post membership rows for a topic run (Phase-2 provisioned).

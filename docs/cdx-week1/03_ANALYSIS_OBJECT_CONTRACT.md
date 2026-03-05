@@ -73,3 +73,45 @@ Normalization:
   "managed_lane": {"status": "pending", "summary": null}
 }
 ```
+
+## Topic Worker Run-Once Contract
+
+### Request
+```json
+{
+  "lock_owner": "api-topic-worker",
+  "lease_seconds": 600,
+  "topic_id": "optional uuid",
+  "force_recompute": false
+}
+```
+
+### Response
+```json
+{
+  "status": "ready|empty|failed|not_found|error|pending",
+  "reason": "reason_code_or_null",
+  "reason_code": "reason_code_or_null",
+  "trace_id": "request-id",
+  "topic_id": "uuid",
+  "topic_run_hash": "sha256",
+  "stats_json": {
+    "worker_version": "topic_worker_v1",
+    "post_count": 3,
+    "first_post_time": "iso8601|null",
+    "last_post_time": "iso8601|null",
+    "comment_count_total": 42,
+    "engagement_sum": 1337
+  },
+  "worker": {
+    "lock_owner": "api-topic-worker",
+    "lease_seconds": 600,
+    "force_recompute": false
+  }
+}
+```
+
+Rules:
+- Worker is re-entrant: same `topic_run` recompute must produce identical `stats_json`.
+- `stats_json` writeback is overwrite-based, never additive.
+- Running locks are lease-based and reclaimable on timeout.

@@ -21,3 +21,11 @@ flowchart TD
   T["scripts/verify_topic_api_contract.py"] --> U["POST create + idempotent"]
   U --> V["GET detail + 400/404 edge cases"]
   V --> W["Header + never-500 checks"]
+
+  X["POST /api/topics/worker/run-once"] --> Y["Claim pending run (lease lock)"]
+  Y --> Z["running -> compute snapshot stats"]
+  Z --> ZA["Overwrite topic_runs.stats_json"]
+  ZA --> ZB["completed (ready) or failed"]
+
+  ZC["scripts/verify_topic_worker_smoke.py"] --> ZD["Run worker twice (force recompute)"]
+  ZD --> ZE["Assert stats_json deterministic equality"]

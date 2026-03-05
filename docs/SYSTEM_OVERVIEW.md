@@ -39,6 +39,7 @@ Pipeline B/C depend on missing modules. The following files are referenced but n
 
 Topic frontend surface is not wired yet:
 - Backend has registry skeleton routes: `POST /api/topics/run`, `GET /api/topics/{topic_id}`.
+- Backend has worker skeleton route: `POST /api/topics/worker/run-once` (lease lock + deterministic snapshot stats).
 - No topic run/detail page in frontend yet.
 
 ## Performance Expectations

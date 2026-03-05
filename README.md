@@ -24,7 +24,8 @@ Threads 貼文抓取 + Supabase SoT + deterministic preanalysis + claims-only LL
 **Topic Engine 現況（2026-03-05）**
 - 已落地：Topic Contract v1、Phase-2 Topic SoT migration（`topic_runs/topic_posts/topic_meta_clusters/topic_lifecycle_daily`）。
 - 已落地（Phase-3 skeleton）：`POST /api/topics/run`、`GET /api/topics/{topic_id}`（immutable registry + deterministic hash + idempotent create）。
-- 尚未落地：meta-cluster/lifecycle compute worker、Topic UI 專屬頁面。
+- 已落地（Phase-3.5 skeleton）：`POST /api/topics/worker/run-once`（lease lock + deterministic snapshot stats overwrite）。
+- 尚未落地：meta-cluster/lifecycle compute、Topic UI 專屬頁面。
 - Hash contract/golden check：`python3 scripts/verify_topic_contract_golden.py`
 
 **主流程骨幹（S1–S6）**
@@ -105,6 +106,7 @@ PYTHONPATH=. python3 scripts/verify_topic_contract_golden.py
 ```bash
 make topic:migration_smoke
 make topic:api_contract
+make topic:worker_smoke
 ```
 
 **Docker（fetch + ingest）**

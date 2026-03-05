@@ -76,6 +76,12 @@ def _pick_seed_post_ids() -> List[int]:
 
 
 def main() -> None:
+    meta_resp = _request("GET", "/api/_meta/build")
+    if meta_resp.status_code != 200:
+        raise AssertionError(f"GET /api/_meta/build failed: {meta_resp.status_code}")
+    meta = _json(meta_resp)
+    print(f"[INFO] build={meta.get('build_sha')} env={meta.get('env')} base={BASE_URL}")
+
     seed_post_ids = _pick_seed_post_ids()
     payload_1 = {
         "topic_name": "Contract Smoke Topic",
