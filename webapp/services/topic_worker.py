@@ -192,12 +192,15 @@ def _try_claim(
     if expected_updated:
         query = query.eq("updated_at", expected_updated)
 
-    resp = query.select(RUN_SELECT).execute()
-    rows = getattr(resp, "data", None) or []
-    if not rows:
+    query.execute()
+    claimed = _load_topic_run(supabase_client, str(row.get("id") or ""))
+    if not claimed:
         return None
-    claimed = rows[0]
-    return claimed if isinstance(claimed, dict) else None
+    if str(claimed.get("status") or "").strip().lower() != "running":
+        return None
+    if str(claimed.get("lock_owner") or "").strip() != lock_owner:
+        return None
+    return claimed
 
 
 def claim_topic_run(
@@ -299,20 +302,20 @@ def _complete_topic_run(
         "lock_owner": None,
         "locked_at": None,
     }
-    resp = (
+    (
         supabase_client.table("topic_runs")
         .update(patch)
         .eq("id", topic_run_id)
         .eq("status", "running")
         .eq("lock_owner", lock_owner)
-        .select(RUN_SELECT)
         .execute()
     )
-    rows = getattr(resp, "data", None) or []
-    if not rows:
+    row = _load_topic_run(supabase_client, topic_run_id)
+    if not row:
         return None
-    row = rows[0]
-    return row if isinstance(row, dict) else None
+    if str(row.get("status") or "").strip().lower() != "completed":
+        return None
+    return row
 
 
 def _fail_topic_run(
@@ -331,20 +334,20 @@ def _fail_topic_run(
         "lock_owner": None,
         "locked_at": None,
     }
-    resp = (
+    (
         supabase_client.table("topic_runs")
         .update(patch)
         .eq("id", topic_run_id)
         .eq("status", "running")
         .eq("lock_owner", lock_owner)
-        .select(RUN_SELECT)
         .execute()
     )
-    rows = getattr(resp, "data", None) or []
-    if not rows:
+    row = _load_topic_run(supabase_client, topic_run_id)
+    if not row:
         return None
-    row = rows[0]
-    return row if isinstance(row, dict) else None
+    if str(row.get("status") or "").strip().lower() != "failed":
+        return None
+    return row
 
 
 def run_topic_worker_once(
